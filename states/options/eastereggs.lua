@@ -64,7 +64,10 @@ function eastereggs.draw()
         local sprite
 
         if month == 1 then
-            sprite = love.graphics.newImage("assets/sprites/CC_januaryIcon_001.png")
+            local t = love.timer.getTime()
+            local frame = math.floor(t * 2) % 2 + 1
+            local spritePath = string.format("assets/sprites/CC_januaryIcon_00%d.png", frame)
+            sprite = love.graphics.newImage(spritePath)
         elseif month == 2 then
             sprite = love.graphics.newImage("assets/sprites/CC_februaryIcon_001.png")
         elseif month == 3 then
