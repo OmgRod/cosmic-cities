@@ -2,6 +2,7 @@ local state = require("include.stateswitcher")
 local autoscale = require("include.autoscale")
 local SpriteFont = require("include.spritefont")
 local Starfield = require("include.background.starfield")
+local MenuButtons = require("include.ui.menubuttons")
 
 local credits = {}
 
@@ -9,8 +10,19 @@ local bigFont = SpriteFont.new("assets/fonts/rainyhearts.fnt", "assets/fonts/")
 local smallFont = SpriteFont.new("assets/fonts/rainyhearts.fnt", "assets/fonts/")
 
 local vw, vh = 640, 480
-
 Starfield.init(vw, vh)
+
+local backButtonScale = 1
+local backPadding = 5 * backButtonScale
+
+local backButtonHeight = bigFont.lineHeight * backButtonScale
+local backButtonY = vh - backButtonHeight - backPadding
+
+local selectedButton = 1
+
+local buttons = MenuButtons.create({
+    { text = "Back", callback = function() state.switch("states/mainmenu") end },
+}, bigFont, backButtonScale, vw, vh, backButtonY, 0)
 
 function credits.update(dt)
     Starfield.update(dt)
@@ -23,14 +35,14 @@ function credits.draw()
 
     Starfield.draw()
 
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(1, 1, 1)
     local title = "Credits"
     local scaleBig = 2
     local titleX = math.floor(320 - (bigFont:getWidth(title, scaleBig) / 2))
     local titleY = math.floor(50)
     bigFont:draw(title, titleX, titleY, scaleBig)
 
-    local text = "Lead Developer - OmgRod\nCharacter Art - Caz Wolf"
+    local text = "Lead Developer - OmgRod\nCharacter Art - Caz Wolf\n"
     local lines = {}
     for line in text:gmatch("[^\n]+") do
         table.insert(lines, line)
@@ -44,12 +56,15 @@ function credits.draw()
         smallFont:draw(line, x, y, scaleSmall)
     end
 
+    MenuButtons.draw(buttons, selectedButton, bigFont, backButtonScale, {1, 1, 0}, {1, 1, 1})
+
     autoscale.reset()
 end
 
 function credits.keypressed(key)
-    if key == "x" then
-        state.switch("states/mainmenu")
+    if key == "return" or key == "z" then
+        if love.keyboard.isDown("lalt", "ralt") then return end
+        MenuButtons.activate(buttons, selectedButton)
     end
 end
 
