@@ -1,6 +1,7 @@
+local autoscale = require("include.autoscale")
 local Starfield = {}
 
-local vw, vh = 640, 480
+local vw, vh = autoscale.getVirtualSize()
 local starCount = 100
 local starSpeed = 2.5
 

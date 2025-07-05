@@ -8,7 +8,7 @@ local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/
 local mainmenu = {}
 local logo = love.graphics.newImage("assets/sprites/CC_titleLogo_001.png")
 
-local vw, vh = 640, 480
+local vw, vh = autoscale.getVirtualSize()
 Starfield.init(vw, vh)
 
 local selectedButton = 1
@@ -19,7 +19,7 @@ local logoScale = (vw * 0.8) / logo:getWidth()
 local logoHeight = logoY + logo:getHeight() * logoScale
 
 local buttons = MenuButtons.create({
-    { text = "Start", callback = function() --[[state.switch("states/game")]] end },
+    { text = "Start", callback = function() state.switch("states/game") end },
     { text = "Options", callback = function() state.switch("states/options") end },
     { text = "Credits", callback = function() state.switch("states/credits") end },
     { text = "Exit", callback = function() love.event.quit() end },
@@ -36,7 +36,7 @@ function mainmenu.draw()
     Starfield.draw()
 
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(logo, 640 * 0.1, logoY, 0, logoScale, logoScale)
+    love.graphics.draw(logo, vw * 0.1, logoY, 0, logoScale, logoScale)
 
     MenuButtons.draw(buttons, selectedButton, bigFont, buttonFontScale, {1, 1, 0}, {1, 1, 1})
 

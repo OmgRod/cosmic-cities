@@ -8,7 +8,7 @@ local options = {}
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 
-local vw, vh = 640, 480
+local vw, vh = autoscale.getVirtualSize()
 Starfield.init(vw, vh)
 
 local buttonScale = 1
