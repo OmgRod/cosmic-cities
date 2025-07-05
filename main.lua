@@ -59,24 +59,25 @@ function love.resize(w, h)
 end
 
 function love.draw()
-    autoscale.apply()
     love.graphics.clear()
 
     if state.current.draw then
         state.current.draw()
     end
 
+    autoscale.apply()
+
     if quitting then
         local dots = string.rep(".", quitDotCount)
         local text = quitMessage .. dots
         local scale = 1.5
 
-        local scaleFactor = autoscale.getScale()
-        local x = 5 * scaleFactor
-        local y = 5 * scaleFactor
+        local x = 5
+        local y = 5
 
         love.graphics.setColor(1, 1, 1, quitFade)
-        quitFont:draw(text, x, y, scale, {0, 0, 0, 1}, 1)
+        quitFont:draw(text, x, y, scale)
+        love.graphics.setColor(1, 1, 1, 1)
     end
 
     autoscale.reset()
