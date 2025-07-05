@@ -3,6 +3,7 @@ local autoscale = require("include.autoscale")
 local SpriteFont = require("include.spritefont")
 local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
+local GameSave = require("include.gamesave")
 
 local options = {}
 
@@ -23,10 +24,23 @@ local buttonSpacing = 5
 local totalButtonsHeight = (buttonHeight * buttonCount) + (buttonSpacing * (buttonCount - 1))
 local startY = (vh / 2) - (totalButtonsHeight / 2) - 50
 
-local buttons = MenuButtons.create({
-    { text = "Toggle Fullscreen", callback = function() love.window.setFullscreen(not love.window.getFullscreen()) end },
-    { text = "Back", callback = function() state.switch("states/mainmenu") end },
-}, bigFont, buttonScale, vw, vh, startY, buttonSpacing)
+GameSave.load()
+
+local function createButtons()
+    return MenuButtons.create({
+        { text = "Fullscreen: " .. (love.window.getFullscreen() and "On" or "Off"), callback = function() 
+            love.window.setFullscreen(not love.window.getFullscreen()) 
+            buttons = createButtons()
+        end },
+        { text = "Easter Eggs: " .. tostring(GameSave.get("monthlies", "EasterEggs") or false), callback = function()
+            GameSave.set("monthlies", not GameSave.get("monthlies", "EasterEggs"), "EasterEggs")
+            buttons = createButtons()
+        end },
+        { text = "Back", callback = function() state.switch("states/mainmenu") end },
+    }, bigFont, buttonScale, vw, vh, startY, buttonSpacing)
+end
+
+buttons = createButtons()
 
 function options.update(dt)
     Starfield.update(dt)
@@ -47,6 +61,45 @@ function options.draw()
     bigFont:draw(title, titleX, titleY, scaleBig)
 
     MenuButtons.draw(buttons, selectedButton, bigFont, buttonScale, {1, 1, 0}, {1, 1, 1})
+    
+    local month = tonumber(os.date("%m"))
+
+    local sprite
+
+    if month == 1 then
+        sprite = love.graphics.newImage("assets/sprites/CC_januaryIcon_001.png")
+    elseif month == 2 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_februaryIcon_001.png")
+    elseif month == 3 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_marchIcon_001.png")
+    elseif month == 4 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_aprilIcon_001.png")
+    elseif month == 5 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_mayIcon_001.png")
+    elseif month == 6 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_juneIcon_001.png")
+    elseif month == 7 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_julyIcon_001.png")
+    elseif month == 8 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_augustIcon_001.png")
+    elseif month == 9 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_septemberIcon_001.png")
+    elseif month == 10 then
+        sprite = love.graphics.newImage("assets/sprites/CC_octoberIcon_001.png")
+    elseif month == 11 then
+        -- sprite = love.graphics.newImage("assets/sprites/CC_novemberIcon_001.png")
+    elseif month == 12 then
+        sprite = love.graphics.newImage("assets/sprites/CC_decemberIcon_001.png")
+    end
+
+    if sprite then
+        local padding = 10
+        local spriteW, spriteH = sprite:getWidth(), sprite:getHeight()
+        local x = vw - spriteW - padding
+        local y = vh - spriteH - padding
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.draw(sprite, x, y, 0)
+    end
 
     autoscale.reset()
 end
