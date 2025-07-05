@@ -5,7 +5,7 @@ local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
 local GameSave = require("include.gamesave")
 
-local options = {}
+local eastereggs = {}
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 
@@ -28,26 +28,21 @@ GameSave.load()
 
 local function createButtons()
     return MenuButtons.create({
-        { text = "Fullscreen: " .. (love.window.getFullscreen() and "On" or "Off"), callback = function() 
-            love.window.setFullscreen(not love.window.getFullscreen()) 
+        { text = "Options Icons: " .. tostring(GameSave.get("monthlies", "EasterEggs") or false), callback = function()
+            GameSave.set("monthlies", not GameSave.get("monthlies", "EasterEggs"), "EasterEggs")
             buttons = createButtons()
         end },
-        -- { text = "Easter Eggs: " .. tostring(GameSave.get("monthlies", "EasterEggs") or false), callback = function()
-        --     GameSave.set("monthlies", not GameSave.get("monthlies", "EasterEggs"), "EasterEggs")
-        --     buttons = createButtons()
-        -- end },
-        { text = "Easter Eggs", callback = function() state.switch("states/options/eastereggs") end },
-        { text = "Back", callback = function() state.switch("states/mainmenu") end },
+        { text = "Back", callback = function() state.switch("states/options") end },
     }, bigFont, buttonScale, vw, vh, startY, buttonSpacing)
 end
 
 buttons = createButtons()
 
-function options.update(dt)
+function eastereggs.update(dt)
     Starfield.update(dt)
 end
 
-function options.draw()
+function eastereggs.draw()
     autoscale.apply()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
@@ -55,7 +50,7 @@ function options.draw()
     Starfield.draw()
 
     love.graphics.setColor(1, 1, 1)
-    local title = "Options"
+    local title = "Easter Eggs"
     local scaleBig = 2
     local titleX = math.floor(vw / 2 - bigFont:getWidth(title, scaleBig) / 2)
     local titleY = 50
@@ -69,10 +64,7 @@ function options.draw()
         local sprite
 
         if month == 1 then
-            local t = love.timer.getTime()
-            local frame = math.floor(t * 2) % 2 + 1
-            local spritePath = string.format("assets/sprites/CC_januaryIcon_00%d.png", frame)
-            sprite = love.graphics.newImage(spritePath)
+            sprite = love.graphics.newImage("assets/sprites/CC_januaryIcon_001.png")
         elseif month == 2 then
             sprite = love.graphics.newImage("assets/sprites/CC_februaryIcon_001.png")
         elseif month == 3 then
@@ -110,7 +102,7 @@ function options.draw()
     autoscale.reset()
 end
 
-function options.keypressed(key)
+function eastereggs.keypressed(key)
     if key == "down" then
         selectedButton = selectedButton % #buttons + 1
     elseif key == "up" then
@@ -121,4 +113,4 @@ function options.keypressed(key)
     end
 end
 
-return options
+return eastereggs
