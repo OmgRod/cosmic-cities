@@ -6,14 +6,14 @@ local MenuButtons = require("include.ui.menubuttons")
 
 local credits = {}
 
-local bigFont = SpriteFont.new("assets/fonts/rainyhearts.fnt", "assets/fonts/")
-local smallFont = SpriteFont.new("assets/fonts/rainyhearts.fnt", "assets/fonts/")
+local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
+local smallFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 
 local vw, vh = 640, 480
 Starfield.init(vw, vh)
 
 local backButtonScale = 1
-local backPadding = 5 * backButtonScale
+local backPadding = 25 * backButtonScale
 
 local backButtonHeight = bigFont.lineHeight * backButtonScale
 local backButtonY = vh - backButtonHeight - backPadding
@@ -62,7 +62,11 @@ function credits.draw()
 end
 
 function credits.keypressed(key)
-    if key == "return" or key == "z" then
+    if key == "down" then
+       selectedButton = selectedButton % #buttons + 1
+    elseif key == "up" then
+       selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
+    elseif key == "return" or key == "z" then
         if love.keyboard.isDown("lalt", "ralt") then return end
         MenuButtons.activate(buttons, selectedButton)
     end

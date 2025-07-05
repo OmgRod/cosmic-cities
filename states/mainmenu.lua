@@ -4,7 +4,7 @@ local Starfield = require("include.background.starfield")
 local SpriteFont = require("include.spritefont")
 local MenuButtons = require("include.ui.menubuttons")
 
-local bigFont = SpriteFont.new("assets/fonts/rainyhearts.fnt", "assets/fonts/")
+local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 local mainmenu = {}
 local logo = love.graphics.newImage("assets/sprites/CC_titleLogo_001.png")
 
@@ -20,7 +20,7 @@ local logoHeight = logoY + logo:getHeight() * logoScale
 
 local buttons = MenuButtons.create({
     { text = "Start", callback = function() --[[state.switch("states/game")]] end },
-    { text = "Options", callback = function() --[[ state.switch("states/options")]] end },
+    { text = "Options", callback = function() state.switch("states/options") end },
     { text = "Credits", callback = function() state.switch("states/credits") end },
     { text = "Exit", callback = function() love.event.quit() end },
 }, bigFont, buttonFontScale, vw, vh, logoHeight, buttonSpacing)
