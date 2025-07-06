@@ -76,7 +76,7 @@ jobs:
             throw "Directory missing for icon assignment."
           }
           $exe = Join-Path $engineDir.FullName "CosmicCities.exe"
-          $ico = Join-Path $PWD "assets\icon64.ico"
+          $ico = Join-Path $PWD "icons\icon64.ico"
           & ".\bin\rcedit.exe" $exe --set-icon $ico
           Set-Location $engineDir.FullName
           Remove-Item love.exe, packed.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe -ErrorAction Ignore
