@@ -51,7 +51,9 @@ jobs:
           cd $folder.FullName
           Copy-Item ..\..\game.love .
           cmd /c "copy /b love.exe+game.love CosmicCities.exe"
-          & ../../tools/rcedit.exe CosmicCities.exe --set-icon ..\..\..\icons\icon64.ico
+          $exePath = (Resolve-Path CosmicCities.exe).Path
+          $iconPath = "${{ github.workspace }}\icons\icon64.ico"
+          & "${{ github.workspace }}\tools\rcedit.exe" $exePath --set-icon $iconPath
           Remove-Item love.exe, game.love, readme.txt, changes.txt
 
       - name: Upload folder as artifact
