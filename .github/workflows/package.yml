@@ -38,6 +38,12 @@ jobs:
           curl -L -o love.zip "${{ matrix.config.url }}"
           powershell -Command "Expand-Archive -Path love.zip -DestinationPath love"
 
+      - name: Download rcedit
+        run: |
+          curl -L -o rcedit.zip https://github.com/electron/rcedit/releases/download/v1.1.1/rcedit-x64.exe
+          mkdir tools
+          move rcedit-x64.exe tools/rcedit.exe
+
       - name: Build Executable
         run: |
           cd love
@@ -45,6 +51,7 @@ jobs:
           cd $folder.FullName
           Copy-Item ..\..\game.love .
           cmd /c "copy /b love.exe+game.love CosmicCities.exe"
+          ../tools/rcedit.exe CosmicCities.exe --set-icon ..\..\icons\icon64.ico
           Remove-Item love.exe, game.love, readme.txt, changes.txt
 
       - name: Upload folder as artifact
