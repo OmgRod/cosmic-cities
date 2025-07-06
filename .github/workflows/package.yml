@@ -47,8 +47,14 @@ jobs:
           cmd /c "copy /b love.exe+game.love CosmicCities.exe"
           Remove-Item love.exe
 
+      - name: Zip Final Build
+        run: |
+          cd love
+          $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" }
+          Compress-Archive -Path "$($folder.FullName)\*" -DestinationPath "../CosmicCities-${{ matrix.config.arch }}.zip"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: CosmicCities-${{ matrix.config.arch }}
-          path: love/**/CosmicCities.exe
+          path: love/CosmicCities-${{ matrix.config.arch }}.zip
