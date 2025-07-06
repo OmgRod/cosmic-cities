@@ -50,11 +50,11 @@ jobs:
           $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" }
           cd $folder.FullName
           Copy-Item ..\..\game.love .
-          cmd /c "copy /b love.exe+game.love CosmicCities.exe"
           $exePath = (Resolve-Path CosmicCities.exe).Path
           $iconPath = "${{ github.workspace }}\icons\icon64.ico"
           & "${{ github.workspace }}\tools\rcedit.exe" $exePath --set-icon $iconPath
-          Remove-Item love.exe, game.love, readme.txt, changes.txt
+          Remove-Item love.exe, game.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe
+          cmd /c "copy /b love.exe+game.love CosmicCities.exe"
 
       - name: Upload folder as artifact
         uses: actions/upload-artifact@v4
