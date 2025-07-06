@@ -30,8 +30,9 @@ jobs:
       - name: Bundle Game Files
         shell: pwsh
         run: |
-          Compress-Archive -Path * -DestinationPath payload.zip -Force
-          Rename-Item payload.zip packed.love
+          $zipPath = Join-Path $PWD "packed.love"
+          Remove-Item $zipPath -ErrorAction Ignore
+          Compress-Archive -Path (Get-ChildItem -Recurse -File) -DestinationPath $zipPath -Force
 
       - name: Fetch Engine Runtime
         shell: pwsh
@@ -88,7 +89,7 @@ jobs:
           $ico = Join-Path $PWD "icons\icon64.ico"
           & ".\bin\rcedit.exe" $exe --set-icon $ico
           Set-Location $engineDir.FullName
-          Remove-Item love.exe, packed.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe -ErrorAction Ignore
+          Remove-Item love.exe, readme.txt, changes.txt, game.ico, love.ico, lovec.exe -ErrorAction Ignore
 
       - name: Archive Final Output
         uses: actions/upload-artifact@v4
