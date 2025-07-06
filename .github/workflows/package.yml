@@ -1,101 +1,88 @@
-name: Build LOVE2D Game
+name: Compile LÖVE Project
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - "**"
+      - '**'
+  workflow_dispatch:
 
 jobs:
-  build:
+  package:
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - name: Windows 64-bit
-            arch: win64
-            os: windows-latest
-            url: https://github.com/love2d/love/releases/download/11.5/love-11.5-win64.zip
-          - name: Windows 32-bit
-            arch: win32
-            os: windows-latest
-            url: https://github.com/love2d/love/releases/download/11.5/love-11.5-win32.zip
+        target:
+          - label: Win64
+            bit: x64
+            runner: windows-latest
+            runtime: https://github.com/love2d/love/releases/download/11.5/love-11.5-win64.zip
+          - label: Win32
+            bit: x86
+            runner: windows-latest
+            runtime: https://github.com/love2d/love/releases/download/11.5/love-11.5-win32.zip
 
-    name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
+    name: Build ${{ matrix.target.label }}
+    runs-on: ${{ matrix.target.runner }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create game.love
+      - name: Bundle Game Files
         shell: pwsh
         run: |
-          Compress-Archive -Path * -DestinationPath game.zip -Force
-          Rename-Item -Path game.zip -NewName game.love
+          Compress-Archive -Path * -DestinationPath payload.zip -Force
+          Rename-Item payload.zip packed.love
 
-      - name: Download LOVE2D Runtime
+      - name: Fetch Engine Runtime
         shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "${{ matrix.config.url }}" -OutFile love.zip
-          Expand-Archive -Path love.zip -DestinationPath love
+          Invoke-WebRequest -Uri "${{ matrix.target.runtime }}" -OutFile runtime.zip
+          Expand-Archive runtime.zip -DestinationPath engine
 
-      - name: Download rcedit
+      - name: Acquire RCEdit Utility
         shell: pwsh
         run: |
-          mkdir tools
-          Invoke-WebRequest -Uri https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe -OutFile tools\rcedit.exe
-          
-      - name: Build Executable - concat love.exe and game.love
-        shell: pwsh
-        run: |
-            $loveRuntimeFolder = Get-ChildItem -Path "${{ github.workspace }}\love" -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
-            if (-not $loveRuntimeFolder) {
-            Write-Error "LOVE2D runtime folder not found."
-            exit 1
-            }
-            $loveRuntimePath = $loveRuntimeFolder.FullName
-            Set-Location $loveRuntimePath
-            cmd /c "copy /b love.exe+game.love CosmicCities.exe"
-    
-            $outputExePath = Join-Path $loveRuntimePath "CosmicCities.exe"
-            if (-not (Test-Path $outputExePath)) {
-            Write-Error "Failed to create CosmicCities.exe at $outputExePath"
-            exit 1
-            }
-            Write-Host "Successfully created CosmicCities.exe at $outputExePath"
+          New-Item -Path bin -ItemType Directory -Force
+          Invoke-WebRequest -Uri https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe -OutFile bin\rcedit.exe
 
-      - name: Copy game.love to runtime folder
+      - name: Create Executable Binary
         shell: pwsh
         run: |
-            $loveRuntimeFolder = Get-ChildItem -Path "${{ github.workspace }}\love" -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
-            if (-not $loveRuntimeFolder) {
-            Write-Error "LOVE2D runtime folder not found."
-            exit 1
-            }
-            $loveRuntimePath = $loveRuntimeFolder.FullName
-            $gameLovePath = Join-Path "${{ github.workspace }}" "game.love"
-            Copy-Item -Path $gameLovePath -Destination $loveRuntimePath -Force
-
-
-      - name: Set Icon and Cleanup
-        shell: pwsh
-        run: |
-          $loveRuntimeFolder = Get-ChildItem -Path "${{ github.workspace }}\love" -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
-          if (-not $loveRuntimeFolder) {
-              Write-Error "LOVE2D runtime folder not found for icon setting."
-              exit 1
+          $engineDir = Get-ChildItem engine -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
+          if (-not $engineDir) {
+            throw "Missing LOVE2D runtime directory."
           }
-          $loveRuntimePath = $loveRuntimeFolder.FullName
-          $exePath = Join-Path $loveRuntimePath "CosmicCities.exe"
-          $iconPath = Join-Path "${{ github.workspace }}" "icons\icon64.ico"
+          $dir = $engineDir.FullName
+          Set-Location $dir
+          cmd /c "copy /b love.exe+..\..\packed.love CosmicCities.exe"
+          if (-not (Test-Path CosmicCities.exe)) {
+            throw "Build failed: CosmicCities.exe not created."
+          }
 
-          & "${{ github.workspace }}\tools\rcedit.exe" $exePath --set-icon $iconPath
+      - name: Place Game Source File
+        shell: pwsh
+        run: |
+          $engineDir = Get-ChildItem engine -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
+          if (-not $engineDir) {
+            throw "Runtime folder not found."
+          }
+          Copy-Item -Path .\packed.love -Destination $engineDir.FullName -Force
 
-          Set-Location $loveRuntimePath
-          Remove-Item -Path love.exe, game.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe -ErrorAction SilentlyContinue
+      - name: Apply Icon and Clean Extras
+        shell: pwsh
+        run: |
+          $engineDir = Get-ChildItem engine -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
+          if (-not $engineDir) {
+            throw "Directory missing for icon assignment."
+          }
+          $exe = Join-Path $engineDir.FullName "CosmicCities.exe"
+          $ico = Join-Path $PWD "assets\icon64.ico"
+          & ".\bin\rcedit.exe" $exe --set-icon $ico
+          Set-Location $engineDir.FullName
+          Remove-Item love.exe, packed.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe -ErrorAction Ignore
 
-      - name: Upload folder as artifact
+      - name: Archive Final Output
         uses: actions/upload-artifact@v4
         with:
-          name: CosmicCities-${{ matrix.config.arch }}
-          path: love/love-11.5-*
+          name: CosmicCities-${{ matrix.target.bit }}
+          path: engine/love-11.5-*
