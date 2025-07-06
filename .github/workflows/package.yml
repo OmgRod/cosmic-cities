@@ -30,7 +30,8 @@ jobs:
 
       - name: Create game.love
         run: |
-          powershell -Command "Compress-Archive -Path * -DestinationPath game.love"
+          powershell -Command "Compress-Archive -Path * -DestinationPath game.zip"
+          Rename-Item -Path game.zip -NewName game.love
 
       - name: Download LOVE2D Runtime
         run: |
