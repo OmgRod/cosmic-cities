@@ -44,14 +44,16 @@ jobs:
           curl -L -o tools/rcedit.exe https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe
 
       - name: Build Executable
+        shell: pwsh
         run: |
-          cd love
-          $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" }
-          cd $folder.FullName
-          Copy-Item ..\..\game.love .
-          cmd /c "copy /b love.exe+game.love CosmicCities.exe"
-          ../tools/rcedit.exe CosmicCities.exe --set-icon ..\..\icons\icon64.ico
-          Remove-Item love.exe, game.love, readme.txt, changes.txt
+            cd love
+            $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" }
+            cd $folder.FullName
+            Copy-Item ..\..\game.love .
+            cmd /c "copy /b love.exe+game.love CosmicCities.exe"
+            & ../tools/rcedit.exe CosmicCities.exe --set-icon ..\..\icons\icon64.ico
+            Remove-Item love.exe, game.love, readme.txt, changes.txt
+
 
       - name: Upload folder as artifact
         uses: actions/upload-artifact@v4
