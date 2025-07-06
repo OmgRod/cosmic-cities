@@ -5,13 +5,13 @@ function love.conf(t)
   t.console = false 
   t.identity = "CosmicCities"                    -- The name of the save directory (string)
   t.appendidentity = false            -- Search files in source directory before save directory (boolean)
-  t.version = "11.4"                  -- The LÖVE version this game was made for (string)
+  t.version = "11.5"                  -- The LÖVE version this game was made for (string)
   t.accelerometerjoystick = true      -- Enable the accelerometer on iOS and Android by exposing it as a Joystick (boolean)
   t.externalstorage = false           -- True to save files (and read from the save directory) in external storage on Android (boolean) 
   t.gammacorrect = false              -- Enable gamma-correct rendering, when supported by the system (boolean) 
   t.audio.mic = false                 -- Request and use microphone capabilities in Android (boolean)
   t.audio.mixwithsystem = true        -- Keep background music playing when opening LOVE (boolean, iOS and Android only)
-  t.window.icon = "icon64.png"
+  t.window.icon = "icons/icon64.png"
   t.window.borderless = false         -- Remove all border visuals from the window (boolean)
   t.window.resizable = false          -- Let the window be user-resizable (boolean)
   t.window.fullscreen = false         -- Enable fullscreen (boolean)

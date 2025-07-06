@@ -81,7 +81,7 @@ function love.draw()
         local text = "Quitting" .. dots
         local scale = 1.5
         local x = 5
-        local y = save and save:get("fps", "Options") and 35 or 5
+        local y = (GameSaveManager.load("options.ini"):get("fps", "Options") == true or GameSaveManager.load("options.ini"):get("fps", "Options") == "true") and 45 or 5
 
         love.graphics.setColor(1, 1, 1, quitFade)
         quitFont:draw(text, x, y, scale)

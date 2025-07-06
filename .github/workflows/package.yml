@@ -1,0 +1,53 @@
+name: Build LOVE2D Game
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: Windows 64-bit
+            arch: win64
+            os: windows-latest
+            url: https://github.com/love2d/love/releases/download/11.5/love-11.5-win64.zip
+
+          - name: Windows 32-bit
+            arch: win32
+            os: windows-latest
+            url: https://github.com/love2d/love/releases/download/11.5/love-11.5-win32.zip
+
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create game.love
+        run: |
+          powershell -Command "Compress-Archive -Path * -DestinationPath game.love"
+
+      - name: Download LOVE2D Runtime
+        run: |
+          curl -L -o love.zip "${{ matrix.config.url }}"
+          powershell -Command "Expand-Archive -Path love.zip -DestinationPath love"
+
+      - name: Build Executable
+        run: |
+          cd love
+          $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" }
+          cd $folder.FullName
+          Copy-Item ..\..\game.love .
+          cmd /c "copy /b love.exe+game.love CosmicCities.exe"
+          Remove-Item love.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CosmicCities-${{ matrix.config.arch }}
+          path: love/**/CosmicCities.exe
