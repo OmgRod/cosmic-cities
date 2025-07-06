@@ -45,7 +45,7 @@ jobs:
           cd $folder.FullName
           Copy-Item ..\..\game.love .
           cmd /c "copy /b love.exe+game.love CosmicCities.exe"
-          Remove-Item love.exe, game.love, readme.txt, change.txt
+          Remove-Item love.exe, game.love, readme.txt, changes.txt
 
       - name: Upload folder as artifact
         uses: actions/upload-artifact@v4
