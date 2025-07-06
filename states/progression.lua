@@ -23,38 +23,15 @@ local buttons = MenuButtons.create({
     { text = "Back", callback = function() state.switch("states/mainmenu") end },
 }, bigFont, backButtonScale, vw, vh, backButtonY, 0)
 
--- function progression.update(dt)
-    -- Starfield.update(dt)
--- end
-
 function progression.draw()
     autoscale.apply()
     love.graphics.clear(245 / 255, 81 / 255, 81 / 255, 1)
 
-    love.graphics.setColor(1, 1, 1, 1)
-
-    -- Starfield.draw()
-
-    -- love.graphics.setColor(1, 1, 1)
-    -- local title = "progression"
-    -- local scaleBig = 2
-    -- local titleX = math.floor(320 - (bigFont:getWidth(title, scaleBig) / 2))
-    -- local titleY = math.floor(50)
-    -- bigFont:draw(title, titleX, titleY, scaleBig)
-
-    -- local text = "Lead Developer - OmgRod\nCharacter Art - Caz Wolf\nSFX - Bfxr"
-    -- local lines = {}
-    -- for line in text:gmatch("[^\n]+") do
-    --     table.insert(lines, line)
-    -- end
-    -- local startY = math.floor(240)
-    -- local scaleSmall = 1
-    -- for i, line in ipairs(lines) do
-    --     local lineWidth = smallFont:getWidth(line, scaleSmall)
-    --     local x = math.floor(320 - (lineWidth / 2))
-    --     local y = math.floor(startY + (i - 1) * smallFont.lineHeight * scaleSmall)
-    --     smallFont:draw(line, x, y, scaleSmall)
-    -- end
+    local planetShadow = love.graphics.newImage("assets/sprites/CC_planetShadow_001.png")
+    local planetX = vw / 2 - planetShadow:getWidth() / 2
+    local planetY = vh / 2 - planetShadow:getHeight() / 2
+    love.graphics.setColor(128 / 255, 42 / 255, 42 / 255, 1)
+    love.graphics.draw(planetShadow, planetX, planetY)
 
     MenuButtons.draw(buttons, selectedButton, bigFont, backButtonScale, {1, 1, 0}, {1, 1, 1})
 
