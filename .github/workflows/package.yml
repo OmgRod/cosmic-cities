@@ -43,34 +43,25 @@ jobs:
           mkdir tools
           curl -L -o tools/rcedit.exe https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe
 
-      - name: Build Executable
+      - name: Build Executable - concat love.exe and game.love
+        shell: cmd
+        run: |
+          cd love
+          for /d %%d in (love-11.5-*) do set folder=%%d
+          cd %folder%
+          copy ..\..\game.love .
+          copy /b love.exe+game.love CosmicCities.exe
+
+      - name: Set Icon and Cleanup
         shell: pwsh
         run: |
           cd love
           $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
           cd $folder.FullName
-          Copy-Item ..\..\game.love .
-          if (-Not (Test-Path game.love)) { exit 1 }
 
-          $loveExePath = (Resolve-Path love.exe).Path
-          $gameLovePath = (Resolve-Path game.love).Path
-          $outputExePath = Join-Path (Get-Location) "CosmicCities.exe"
-
-          if (Test-Path $outputExePath) {
-            Remove-Item $outputExePath
-          }
-
-          $bytesExe = [System.IO.File]::ReadAllBytes($loveExePath)
-          $bytesLove = [System.IO.File]::ReadAllBytes($gameLovePath)
-          $combinedBytes = New-Object byte[] ($bytesExe.Length + $bytesLove.Length)
-
-          [System.Buffer]::BlockCopy($bytesExe, 0, $combinedBytes, 0, $bytesExe.Length)
-          [System.Buffer]::BlockCopy($bytesLove, 0, $combinedBytes, $bytesExe.Length, $bytesLove.Length)
-
-          [System.IO.File]::WriteAllBytes($outputExePath, $combinedBytes)
-
+          $exePath = Join-Path (Get-Location) "CosmicCities.exe"
           $iconPath = "${{ github.workspace }}\icons\icon64.ico"
-          & "${{ github.workspace }}\tools\rcedit.exe" $outputExePath --set-icon $iconPath
+          & "${{ github.workspace }}\tools\rcedit.exe" $exePath --set-icon $iconPath
 
           Remove-Item love.exe, game.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe
 
