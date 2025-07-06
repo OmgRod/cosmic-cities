@@ -40,6 +40,7 @@ jobs:
 
       - name: Download rcedit
         run: |
+          mkdir tools
           curl -L -o tools/rcedit.exe https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe
 
       - name: Build Executable
