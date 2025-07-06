@@ -28,10 +28,13 @@ GameSave.load()
 
 local function createButtons()
     return MenuButtons.create({
-        { text = "Options Icons: " .. tostring(GameSave.get("monthlies", "EasterEggs") or false), callback = function()
+        { 
+            text = "Options Icons: " .. ((GameSave.get("monthlies", "EasterEggs") and "On") or "Off"), 
+            callback = function()
             GameSave.set("monthlies", not GameSave.get("monthlies", "EasterEggs"), "EasterEggs")
             buttons = createButtons()
-        end },
+            end
+        },
         { text = "Back", callback = function() state.switch("states/options") end },
     }, bigFont, buttonScale, vw, vh, startY, buttonSpacing)
 end
@@ -75,11 +78,11 @@ function eastereggs.draw()
         elseif month == 4 then
             sprite = love.graphics.newImage("assets/sprites/CC_aprilIcon_001.png")
         elseif month == 5 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_mayIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_mayIcon_001.png")
         elseif month == 6 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_juneIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_juneIcon_001.png")
         elseif month == 7 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_julyIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_julyIcon_001.png")
         elseif month == 8 then
             -- sprite = love.graphics.newImage("assets/sprites/CC_augustIcon_001.png")
         elseif month == 9 then

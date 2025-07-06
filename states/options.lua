@@ -32,10 +32,13 @@ local function createButtons()
             love.window.setFullscreen(not love.window.getFullscreen()) 
             buttons = createButtons()
         end },
-        -- { text = "Easter Eggs: " .. tostring(GameSave.get("monthlies", "EasterEggs") or false), callback = function()
-        --     GameSave.set("monthlies", not GameSave.get("monthlies", "EasterEggs"), "EasterEggs")
-        --     buttons = createButtons()
-        -- end },
+        {
+            text = "Show FPS: " .. ((GameSave.get("fps", "Options") and "On") or "Off"), 
+            callback = function()
+            GameSave.set("fps", not GameSave.get("fps", "Options"), "Options")
+            buttons = createButtons()
+            end
+        },
         { text = "Easter Eggs", callback = function() state.switch("states/options/eastereggs") end },
         { text = "Back", callback = function() state.switch("states/mainmenu") end },
     }, bigFont, buttonScale, vw, vh, startY, buttonSpacing)
@@ -80,11 +83,11 @@ function options.draw()
         elseif month == 4 then
             sprite = love.graphics.newImage("assets/sprites/CC_aprilIcon_001.png")
         elseif month == 5 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_mayIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_mayIcon_001.png")
         elseif month == 6 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_juneIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_juneIcon_001.png")
         elseif month == 7 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_julyIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_julyIcon_001.png")
         elseif month == 8 then
             -- sprite = love.graphics.newImage("assets/sprites/CC_augustIcon_001.png")
         elseif month == 9 then

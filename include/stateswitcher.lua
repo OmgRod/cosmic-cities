@@ -15,8 +15,13 @@ Modified by OmgRod
 ]]--
 
 passvar = {}
-state = {}
-state.current = {}
+
+state = {
+   current = {},
+   name = "",
+   music = nil,
+   musicId = nil
+}
 
 function state.switch(stateName)
    passvar = {}
@@ -32,7 +37,35 @@ function state.switch(stateName)
       end
    end
    package.loaded[stateName] = false
+   state.name = stateName
    state.current = require(stateName)
+
+   local menuStates = {
+      ["states/credits"] = true,
+      ["states/options"] = true,
+      ["states/options/eastereggs"] = true,
+      ["states/mainmenu"] = true
+   }
+
+   if menuStates[stateName] then
+      if state.music == nil or state.musicId ~= "intro" then
+         if state.music and state.music:isPlaying() then
+            state.music:stop()
+         end
+         state.music = love.audio.newSource("assets/sounds/music.intro.mp3", "stream")
+         state.music:setLooping(true)
+         state.music:play()
+         state.musicId = "intro"
+      elseif not state.music:isPlaying() then
+         state.music:play()
+      end
+   else
+      if state.music and state.music:isPlaying() and state.musicId == "intro" then
+         state.music:stop()
+         state.music = nil
+         state.musicId = nil
+      end
+   end
 end
 
 function state.clear()

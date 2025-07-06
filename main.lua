@@ -2,22 +2,21 @@ state = require("include.stateswitcher")
 autoscale = require("include.autoscale")
 local fntparser = require("include.fntparser")
 local SpriteFont = require("include.spritefont")
+local flux = require("include.flux")
+local GameSave = require("include.gamesave")
 
 local escapeHoldTime = 0
 local escapeHeld = false
 
+local deltatime;
+
 local quitFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
-local quitMessage = "Quitting"
 local quitDotCount = 0
-local quitFade = 0
+quitFade = 0
 local quitDotTimer = 0
 local quitting = false
 
 local vw, vh = autoscale.getVirtualSize()
-
-local function lerp(a, b, t)
-    return a + (b - a) * t
-end
 
 function love.load()
     autoscale.load()
@@ -26,12 +25,18 @@ function love.load()
 end
 
 function love.update(dt)
+    flux.update(dt)
+
+    deltatime = dt
+
     if escapeHeld then
         escapeHoldTime = escapeHoldTime + dt
         if escapeHoldTime >= 2 and not quitting then
             quitting = true
             quitDotCount = 0
             quitDotTimer = 0
+
+            flux.to(_G, 1/3, { quitFade = 1 }):ease("quadout")
         end
     end
 
@@ -41,8 +46,6 @@ function love.update(dt)
             quitDotTimer = quitDotTimer - 1
             quitDotCount = (quitDotCount % 3) + 1
         end
-
-        quitFade = lerp(quitFade, 1, math.min(1, 3 * dt))
     end
 
     if quitting and escapeHoldTime >= 5 then
@@ -69,13 +72,34 @@ function love.draw()
 
     if quitting then
         local dots = string.rep(".", quitDotCount)
-        local text = quitMessage .. dots
+        local text = "Quitting" .. dots
+        local scale = 1.5
+
+        local x = 5
+        local y = 35
+
+        love.graphics.setColor(1, 1, 1, quitFade)
+        quitFont:draw(text, x, y, scale)
+        love.graphics.setColor(1, 1, 1, 1)
+    end
+
+    if GameSave.get("fps", "Options") then
+        if not love.fpsDisplayTimer then love.fpsDisplayTimer = 0 end
+        if not love.fpsDisplayValue then love.fpsDisplayValue = 0 end
+
+        love.fpsDisplayTimer = love.fpsDisplayTimer + deltatime
+        if love.fpsDisplayTimer >= 0.2 then
+            love.fpsDisplayValue = math.floor(1 / deltatime + 0.5)
+            love.fpsDisplayTimer = 0
+        end
+
+        local text = "FPS: " .. love.fpsDisplayValue
         local scale = 1.5
 
         local x = 5
         local y = 5
 
-        love.graphics.setColor(1, 1, 1, quitFade)
+        love.graphics.setColor(1, 1, 1)
         quitFont:draw(text, x, y, scale)
         love.graphics.setColor(1, 1, 1, 1)
     end
@@ -96,6 +120,7 @@ function love.keypressed(key, scancode, isrepeat)
         quitDotCount = 0
         quitDotTimer = 0
         quitFade = 0
+        flux.remove(_G, "quitFade")
     end
 
     if state.current.keypressed then
@@ -111,5 +136,6 @@ function love.keyreleased(key)
         quitDotCount = 0
         quitDotTimer = 0
         quitFade = 0
+        flux.remove(_G, "quitFade")
     end
 end
