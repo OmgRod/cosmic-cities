@@ -18,6 +18,8 @@ local quitting = false
 
 local vw, vh = autoscale.getVirtualSize()
 
+GameSave.load()
+
 function love.load()
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
