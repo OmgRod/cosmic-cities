@@ -54,7 +54,7 @@ jobs:
 
           $loveExePath = (Resolve-Path love.exe).Path
           $gameLovePath = (Resolve-Path game.love).Path
-          $outputExePath = (Resolve-Path CosmicCities.exe -ErrorAction SilentlyContinue).Path
+          $outputExePath = Join-Path (Get-Location) "CosmicCities.exe"
 
           if (Test-Path $outputExePath) {
             Remove-Item $outputExePath
@@ -67,10 +67,10 @@ jobs:
           [System.Buffer]::BlockCopy($bytesExe, 0, $combinedBytes, 0, $bytesExe.Length)
           [System.Buffer]::BlockCopy($bytesLove, 0, $combinedBytes, $bytesExe.Length, $bytesLove.Length)
 
-          [System.IO.File]::WriteAllBytes("CosmicCities.exe", $combinedBytes)
+          [System.IO.File]::WriteAllBytes($outputExePath, $combinedBytes)
 
           $iconPath = "${{ github.workspace }}\icons\icon64.ico"
-          & "${{ github.workspace }}\tools\rcedit.exe" ".\CosmicCities.exe" --set-icon $iconPath
+          & "${{ github.workspace }}\tools\rcedit.exe" $outputExePath --set-icon $iconPath
 
           Remove-Item love.exe, game.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe
 
