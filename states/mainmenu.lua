@@ -22,16 +22,21 @@ local buttons = MenuButtons.create({
     { text = "Start", callback = function() state.switch("states/game") end },
     { text = "Options", callback = function() state.switch("states/options") end },
     { text = "Credits", callback = function() state.switch("states/credits") end },
+    { text = "Test", callback = function() state.switch("states/progression") end },
     { text = "Exit", callback = function() love.event.quit() end },
 }, bigFont, buttonFontScale, vw, vh, logoHeight, buttonSpacing)
+
+local selectSound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
 
 function mainmenu.update(dt)
     Starfield.update(dt)
 end
 
 function mainmenu.draw()
-    autoscale.apply()
+    love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
+
+    autoscale.apply()
 
     Starfield.draw()
 
@@ -44,17 +49,16 @@ function mainmenu.draw()
 end
 
 function mainmenu.keypressed(key, scancode, isrepeat)
-    local sound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
-   if key == "down" then
-       selectedButton = selectedButton % #buttons + 1
-       sound:play()
-   elseif key == "up" then
-       selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
-       sound:play()
-   elseif key == "return" or key == "z" then
-      if love.keyboard.isDown("lalt", "ralt") then return end
-      MenuButtons.activate(buttons, selectedButton)
-   end
+    if key == "down" then
+        selectedButton = selectedButton % #buttons + 1
+        selectSound:play()
+    elseif key == "up" then
+        selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
+        selectSound:play()
+    elseif key == "return" or key == "z" then
+        if love.keyboard.isDown("lalt", "ralt") then return end
+        MenuButtons.activate(buttons, selectedButton)
+    end
 end
 
 return mainmenu

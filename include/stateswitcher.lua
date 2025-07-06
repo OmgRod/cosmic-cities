@@ -52,7 +52,7 @@ function state.switch(stateName)
          if state.music and state.music:isPlaying() then
             state.music:stop()
          end
-         state.music = love.audio.newSource("assets/sounds/music.intro.mp3", "stream")
+         state.music = love.audio.newSource("assets/sounds/music.intro.wav", "stream")
          state.music:setLooping(true)
          state.music:play()
          state.musicId = "intro"

@@ -3,7 +3,7 @@ local autoscale = require("include.autoscale")
 local SpriteFont = require("include.spritefont")
 local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
-local GameSave = require("include.gamesave")
+local GameSaveManager = require("include.gamesave")
 
 local options = {}
 
@@ -24,7 +24,13 @@ local buttonSpacing = 5
 local totalButtonsHeight = (buttonHeight * buttonCount) + (buttonSpacing * (buttonCount - 1))
 local startY = (vh / 2) - (totalButtonsHeight / 2) - 50
 
-GameSave.load()
+local save
+
+function options.loadSave(filename)
+    save = GameSaveManager.load(filename or "options.ini")
+end
+
+options.loadSave()
 
 local function createButtons()
     return MenuButtons.create({
@@ -33,10 +39,11 @@ local function createButtons()
             buttons = createButtons()
         end },
         {
-            text = "Show FPS: " .. ((GameSave.get("fps", "Options") and "On") or "Off"), 
+            text = "Show FPS: " .. ((save:get("fps", "Options") and "On") or "Off"), 
             callback = function()
-            GameSave.set("fps", not GameSave.get("fps", "Options"), "Options")
-            buttons = createButtons()
+                save:set("fps", not save:get("fps", "Options"), "Options")
+                save:save("options.ini")
+                buttons = createButtons()
             end
         },
         { text = "Easter Eggs", callback = function() state.switch("states/options/eastereggs") end },
@@ -66,7 +73,7 @@ function options.draw()
 
     MenuButtons.draw(buttons, selectedButton, bigFont, buttonScale, {1, 1, 0}, {1, 1, 1})
 
-    if GameSave.get("monthlies", "EasterEggs") then
+    if save:get("monthlies", "EasterEggs") then
         local month = tonumber(os.date("%m"))
 
         local sprite

@@ -1,77 +1,98 @@
 local LIP = require("include.LIP")
 
-local GameSave = {}
+local GameSaveManager = {}
 
-local saveFileName = "save.ini"
-local data = {}
+local SaveFile = {}
+SaveFile.__index = SaveFile
 
-local function getGroup(tbl, group)
+function SaveFile.new(filename)
+  assert(type(filename) == "string", "Filename must be a string.")
+  assert(filename:match("%.ini$"), "Filename must end in .ini")
+
+  local self = setmetatable({}, SaveFile)
+  self.filename = filename
+  self.data = {}
+
+  self:load()
+  return self
+end
+
+function SaveFile:load()
+  if not love.filesystem.getInfo(self.filename) then
+    self.data = {}
+    return false
+  end
+  local success, result = pcall(LIP.load, self.filename)
+  if success and type(result) == "table" then
+    self.data = result
+    return true
+  else
+    self.data = {}
+    return false
+  end
+end
+
+function SaveFile:save()
+  local success, err = LIP.save(self.filename, self.data)
+  if success then
+    love.filesystem.sync()
+    return true
+  else
+    print("Error saving file:", err)
+    return false, err
+  end
+end
+
+function SaveFile:getGroup(group)
   if group then
-    data[group] = data[group] or {}
-    return data[group]
+    self.data[group] = self.data[group] or {}
+    return self.data[group]
   else
-    return data
+    return self.data
   end
 end
 
-function GameSave.load()
-  if not love.filesystem.getInfo(saveFileName) then
-    data = {}
-    return false
-  end
-  local success, loadedData = pcall(LIP.load, saveFileName)
-  if success and type(loadedData) == "table" then
-    data = loadedData
-    return true
-  else
-    data = {}
-    return false
-  end
+function SaveFile:set(key, value, group)
+  local target = self:getGroup(group)
+  target[key] = value
+  return self:save()
 end
 
-function GameSave.save()
-  LIP.save(saveFileName, data)
+function SaveFile:get(key, group)
+  local target = self:getGroup(group)
+  return target[key]
 end
 
-function GameSave.set(key, value, group)
-  local tbl = getGroup(data, group)
-  tbl[key] = value
-  GameSave.save()
-end
-
-function GameSave.get(key, group)
-  local tbl = getGroup(data, group)
-  return tbl[key]
-end
-
-function GameSave.removeKey(key, group)
-  local tbl = getGroup(data, group)
-  if tbl[key] ~= nil then
-    tbl[key] = nil
-    GameSave.save()
-    return true
+function SaveFile:removeKey(key, group)
+  local target = self:getGroup(group)
+  if target[key] ~= nil then
+    target[key] = nil
+    return self:save()
   end
   return false
 end
 
-function GameSave.removeGroup(group)
-  if data[group] then
-    data[group] = nil
-    GameSave.save()
-    return true
+function SaveFile:removeGroup(group)
+  if self.data[group] then
+    self.data[group] = nil
+    return self:save()
   end
   return false
 end
 
-function GameSave.exists()
-  return love.filesystem.getInfo(saveFileName) ~= nil
-end
-
-function GameSave.delete()
-  if love.filesystem.getInfo(saveFileName) then
-    love.filesystem.remove(saveFileName)
+function SaveFile:delete()
+  if love.filesystem.getInfo(self.filename) then
+    love.filesystem.remove(self.filename)
   end
-  data = {}
+  self.data = {}
 end
 
-return GameSave
+function SaveFile:exists()
+  return love.filesystem.getInfo(self.filename) ~= nil
+end
+
+function GameSaveManager.load(filename)
+  return SaveFile.new(filename)
+end
+
+return GameSaveManager

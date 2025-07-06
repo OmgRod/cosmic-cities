@@ -3,7 +3,7 @@ autoscale = require("include.autoscale")
 local fntparser = require("include.fntparser")
 local SpriteFont = require("include.spritefont")
 local flux = require("include.flux")
-local GameSave = require("include.gamesave")
+local GameSaveManager = require("include.gamesave")
 
 local escapeHoldTime = 0
 local escapeHeld = false
@@ -18,11 +18,14 @@ local quitting = false
 
 local vw, vh = autoscale.getVirtualSize()
 
-GameSave.load()
+local save
 
 function love.load()
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
+
+    save = GameSaveManager.load("options.ini")
+
     state.switch("states/mainmenu")
 end
 
@@ -64,28 +67,30 @@ function love.resize(w, h)
 end
 
 function love.draw()
+    love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
+    autoscale.apply()
     if state.current.draw then
         state.current.draw()
     end
-
-    autoscale.apply()
+    autoscale.reset()
 
     if quitting then
         local dots = string.rep(".", quitDotCount)
         local text = "Quitting" .. dots
         local scale = 1.5
-
         local x = 5
-        local y = 35
+        local y = save and save:get("fps", "Options") and 35 or 5
 
         love.graphics.setColor(1, 1, 1, quitFade)
         quitFont:draw(text, x, y, scale)
-        love.graphics.setColor(1, 1, 1, 1)
     end
 
-    if GameSave.get("fps", "Options") then
+    local rawFps = GameSaveManager.load("options.ini"):get("fps", "Options")
+    local showFps = rawFps == true or rawFps == "true"
+
+    if showFps then
         if not love.fpsDisplayTimer then love.fpsDisplayTimer = 0 end
         if not love.fpsDisplayValue then love.fpsDisplayValue = 0 end
 
@@ -97,16 +102,13 @@ function love.draw()
 
         local text = "FPS: " .. love.fpsDisplayValue
         local scale = 1.5
-
-        local x = 5
-        local y = 5
+        local x, y = 5, 5
 
         love.graphics.setColor(1, 1, 1)
         quitFont:draw(text, x, y, scale)
-        love.graphics.setColor(1, 1, 1, 1)
     end
 
-    autoscale.reset()
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 function love.keypressed(key, scancode, isrepeat)
