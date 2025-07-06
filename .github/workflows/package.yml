@@ -44,29 +44,38 @@ jobs:
         run: |
           mkdir tools
           Invoke-WebRequest -Uri https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe -OutFile tools\rcedit.exe
-
+          
       - name: Build Executable - concat love.exe and game.love
         shell: pwsh
         run: |
-          $loveRuntimeFolder = Get-ChildItem -Path "${{ github.workspace }}\love" -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
-          if (-not $loveRuntimeFolder) {
-              Write-Error "LOVE2D runtime folder not found."
-              exit 1
-          }
-          $loveRuntimePath = $loveRuntimeFolder.FullName
-          $gameLovePath = Join-Path "${{ github.workspace }}" "game.love"
-          $loveExePath = Join-Path $loveRuntimePath "love.exe"
-          $outputExePath = Join-Path $loveRuntimePath "CosmicCities.exe"
+            $loveRuntimeFolder = Get-ChildItem -Path "${{ github.workspace }}\love" -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
+            if (-not $loveRuntimeFolder) {
+            Write-Error "LOVE2D runtime folder not found."
+            exit 1
+            }
+            $loveRuntimePath = $loveRuntimeFolder.FullName
+            Set-Location $loveRuntimePath
+            cmd /c "copy /b love.exe+game.love CosmicCities.exe"
+    
+            $outputExePath = Join-Path $loveRuntimePath "CosmicCities.exe"
+            if (-not (Test-Path $outputExePath)) {
+            Write-Error "Failed to create CosmicCities.exe at $outputExePath"
+            exit 1
+            }
+            Write-Host "Successfully created CosmicCities.exe at $outputExePath"
 
-          Copy-Item -Path $gameLovePath -Destination $loveRuntimePath -Force
-          Set-Location $loveRuntimePath
-          cmd /c "copy /b love.exe+game.love CosmicCities.exe"
+      - name: Copy game.love to runtime folder
+        shell: pwsh
+        run: |
+            $loveRuntimeFolder = Get-ChildItem -Path "${{ github.workspace }}\love" -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
+            if (-not $loveRuntimeFolder) {
+            Write-Error "LOVE2D runtime folder not found."
+            exit 1
+            }
+            $loveRuntimePath = $loveRuntimeFolder.FullName
+            $gameLovePath = Join-Path "${{ github.workspace }}" "game.love"
+            Copy-Item -Path $gameLovePath -Destination $loveRuntimePath -Force
 
-          if (-not (Test-Path $outputExePath)) {
-              Write-Error "Failed to create CosmicCities.exe at $outputExePath"
-              exit 1
-          }
-          Write-Host "Successfully created CosmicCities.exe at $outputExePath"
 
       - name: Set Icon and Cleanup
         shell: pwsh
