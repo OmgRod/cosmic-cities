@@ -84,13 +84,13 @@ function eastereggs.draw()
         elseif month == 7 then
             sprite = love.graphics.newImage("assets/sprites/CC_julyIcon_001.png")
         elseif month == 8 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_augustIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_augustIcon_001.png")
         elseif month == 9 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_septemberIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_septemberIcon_001.png")
         elseif month == 10 then
             sprite = love.graphics.newImage("assets/sprites/CC_octoberIcon_001.png")
         elseif month == 11 then
-            -- sprite = love.graphics.newImage("assets/sprites/CC_novemberIcon_001.png")
+            sprite = love.graphics.newImage("assets/sprites/CC_novemberIcon_001.png")
         elseif month == 12 then
             sprite = love.graphics.newImage("assets/sprites/CC_decemberIcon_001.png")
         end
@@ -109,10 +109,13 @@ function eastereggs.draw()
 end
 
 function eastereggs.keypressed(key)
+    local sound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
     if key == "down" then
         selectedButton = selectedButton % #buttons + 1
+        sound:play()
     elseif key == "up" then
         selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
+        sound:play()
     elseif key == "return" or key == "z" then
         if love.keyboard.isDown("lalt", "ralt") then return end
         MenuButtons.activate(buttons, selectedButton)

@@ -44,10 +44,13 @@ function mainmenu.draw()
 end
 
 function mainmenu.keypressed(key, scancode, isrepeat)
+    local sound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
    if key == "down" then
        selectedButton = selectedButton % #buttons + 1
+       sound:play()
    elseif key == "up" then
        selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
+       sound:play()
    elseif key == "return" or key == "z" then
       if love.keyboard.isDown("lalt", "ralt") then return end
       MenuButtons.activate(buttons, selectedButton)
