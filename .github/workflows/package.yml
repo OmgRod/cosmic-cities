@@ -53,10 +53,20 @@ jobs:
             throw "Missing LOVE2D runtime directory."
           }
           $dir = $engineDir.FullName
-          Set-Location $dir
-          cmd /c "copy /b love.exe+..\..\packed.love CosmicCities.exe"
-          if (-not (Test-Path CosmicCities.exe)) {
+          $loveExePath = Join-Path $dir "love.exe"
+          $packedLovePath = Join-Path $PWD "packed.love"
+          $outputExePath = Join-Path $dir "CosmicCities.exe"
+
+          $exeBytes = [System.IO.File]::ReadAllBytes($loveExePath)
+          $loveBytes = [System.IO.File]::ReadAllBytes($packedLovePath)
+          $combined = New-Object byte[] ($exeBytes.Length + $loveBytes.Length)
+          [System.Buffer]::BlockCopy($exeBytes, 0, $combined, 0, $exeBytes.Length)
+          [System.Buffer]::BlockCopy($loveBytes, 0, $combined, $exeBytes.Length, $loveBytes.Length)
+          [System.IO.File]::WriteAllBytes($outputExePath, $combined)
+
+          if (-not (Test-Path $outputExePath)) {
             throw "Build failed: CosmicCities.exe not created."
+          }
           }
 
       - name: Place Game Source File
