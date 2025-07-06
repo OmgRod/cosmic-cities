@@ -46,17 +46,33 @@ jobs:
       - name: Build Executable
         shell: pwsh
         run: |
-            cd love
-            $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
-            cd $folder.FullName
-            Copy-Item ..\..\game.love .
-            if (-Not (Test-Path game.love)) { exit 1 }
-            cmd /c "copy /b love.exe+game.love CosmicCities.exe"
-            if (-Not (Test-Path CosmicCities.exe)) { exit 1 }
-            $exePath = (Resolve-Path CosmicCities.exe).Path
-            $iconPath = "${{ github.workspace }}\icons\icon64.ico"
-            & "${{ github.workspace }}\tools\rcedit.exe" $exePath --set-icon $iconPath
-            Remove-Item love.exe, game.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe
+          cd love
+          $folder = Get-ChildItem -Directory | Where-Object { $_.Name -like "love-11.5-*" } | Select-Object -First 1
+          cd $folder.FullName
+          Copy-Item ..\..\game.love .
+          if (-Not (Test-Path game.love)) { exit 1 }
+
+          $loveExePath = (Resolve-Path love.exe).Path
+          $gameLovePath = (Resolve-Path game.love).Path
+          $outputExePath = (Resolve-Path CosmicCities.exe -ErrorAction SilentlyContinue).Path
+
+          if (Test-Path $outputExePath) {
+            Remove-Item $outputExePath
+          }
+
+          $bytesExe = [System.IO.File]::ReadAllBytes($loveExePath)
+          $bytesLove = [System.IO.File]::ReadAllBytes($gameLovePath)
+          $combinedBytes = New-Object byte[] ($bytesExe.Length + $bytesLove.Length)
+
+          [System.Buffer]::BlockCopy($bytesExe, 0, $combinedBytes, 0, $bytesExe.Length)
+          [System.Buffer]::BlockCopy($bytesLove, 0, $combinedBytes, $bytesExe.Length, $bytesLove.Length)
+
+          [System.IO.File]::WriteAllBytes("CosmicCities.exe", $combinedBytes)
+
+          $iconPath = "${{ github.workspace }}\icons\icon64.ico"
+          & "${{ github.workspace }}\tools\rcedit.exe" ".\CosmicCities.exe" --set-icon $iconPath
+
+          Remove-Item love.exe, game.love, readme.txt, changes.txt, game.ico, love.ico, lovec.exe
 
       - name: Upload folder as artifact
         uses: actions/upload-artifact@v4
