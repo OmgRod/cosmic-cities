@@ -44,7 +44,8 @@ function state.switch(stateName)
       ["states/credits"] = true,
       ["states/options"] = true,
       ["states/options/eastereggs"] = true,
-      ["states/mainmenu"] = true
+      ["states/mainmenu"] = true,
+      ["states/selectsave"] = true
    }
 
    if menuStates[stateName] then

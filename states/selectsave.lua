@@ -2,7 +2,8 @@ local state = require("include.stateswitcher")
 local autoscale = require("include.autoscale")
 local SpriteFont = require("include.spritefont")
 local Starfield = require("include.background.starfield")
-local QwertyButtons = require("include.ui.qwertybuttons")
+local MenuSaveSlots = require("include.ui.menusaveslots")
+local GameSaveManager = require("include.gamesave")
 
 local selectsave = {}
 
@@ -10,137 +11,108 @@ local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/
 local vw, vh = autoscale.getVirtualSize()
 Starfield.init(vw, vh)
 
-local buttonScale = 1
-local keySpacingX = 50
-local keySpacingY = 60
-local startY = vh / 2 - keySpacingY
+local selectedSlot = 1
+local slotScale = 0.85
+local slotSpacing = 8
+local slotWidth = 360
+local slotHeight = 85
+local startY = 110
 
-local typedText = ""
+local save = GameSaveManager.load("selectsave.ini")
 
-local layoutRows = {
-    "QWERTYUIOP",
-    "ASDFGHJKL",
-    "ZXCVBNM"
+local saveSlots
+
+local backButton = {
+    text = "Back",
+    callback = function()
+        state.switch("states/mainmenu")
+    end
 }
 
-local backspaceImage = love.graphics.newImage("assets/sprites/keys/CC_backspace_001.png")
-
-local buttonDefs = {}
-
-local rowWidths = {}
-for i, row in ipairs(layoutRows) do
-    rowWidths[i] = #row * keySpacingX
+local function formatTime(seconds)
+    seconds = tonumber(seconds or 0)
+    local h = math.floor(seconds / 3600)
+    local m = math.floor((seconds % 3600) / 60)
+    local s = math.floor(seconds % 60)
+    return string.format("%02d:%02d:%02d", h, m, s)
 end
 
-for rowIndex, row in ipairs(layoutRows) do
-    local rowWidth = rowWidths[rowIndex]
-    local rowStartX = vw / 2 - rowWidth / 2
-    for col = 1, #row do
-        local char = row:sub(col, col)
-        table.insert(buttonDefs, {
-            text = char,
-            x = rowStartX + keySpacingX * (col - 1),
-            y = startY + keySpacingY * (rowIndex - 1),
-            row = rowIndex,
-            col = col,
-            callback = function() typedText = typedText .. char end
+local function createSlots()
+    local slots = {}
+
+    for i = 1, 3 do
+        local filename = "save" .. i .. ".ini"
+        local s = GameSaveManager.load(filename)
+        local playerName = s:get("playerName", "Meta") or "Unknown"
+        local timePlayed = tonumber(s:get("time", "Meta")) or 0
+
+        table.insert(slots, {
+            slotName = "Slot " .. i,
+            playtime = formatTime(timePlayed),
+            playerName = playerName,
+            callback = function()
+                state.switch("states/loadslot;slot_" .. tostring(i))
+            end
         })
     end
+
+    return MenuSaveSlots.create(slots, bigFont, slotScale, vw, vh, startY, slotSpacing, slotWidth, slotHeight)
 end
 
-table.insert(buttonDefs, {
-    text = "",
-    image = backspaceImage,
-    x = vw / 2 + 100,
-    y = startY + keySpacingY * 3.5,
-    row = 4,
-    col = 6,
-    callback = function()
-        typedText = typedText:sub(1, -2)
-    end
-})
+saveSlots = createSlots()
 
-local backButtonY = startY + keySpacingY * 3.5
+local totalItems = #saveSlots + 1
 
-table.insert(buttonDefs, {
-    text = "Back",
-    x = vw / 2 - 150,
-    y = backButtonY - (bigFont.lineHeight * buttonScale) / 2,
-    row = 4,
-    col = 4,
-    callback = function() state.switch("states/mainmenu") end
-})
-
-local buttons = QwertyButtons.create(buttonDefs, bigFont, buttonScale)
-local selectedButton = 1
+function selectsave.update(dt)
+    Starfield.update(dt)
+end
 
 function selectsave.draw()
     autoscale.apply()
-    love.graphics.clear(245 / 255, 81 / 255, 81 / 255, 1)
+    love.graphics.setBackgroundColor(0, 0, 0)
+    love.graphics.clear()
+
+    Starfield.draw()
 
     love.graphics.setColor(1, 1, 1)
-    local labelX = vw / 2 - bigFont:getWidth(typedText, buttonScale) / 2
-    local labelY = startY - 70
-    bigFont:draw(typedText, labelX, labelY, buttonScale)
+    local title = "Select a save"
+    local scaleBig = 1.8
+    local titleX = math.floor(vw / 2 - bigFont:getWidth(title, scaleBig) / 2)
+    local titleY = 40
+    bigFont:draw(title, titleX, titleY, scaleBig)
 
-    QwertyButtons.draw(buttons, selectedButton, bigFont, buttonScale, {1, 1, 0}, {1, 1, 1})
+    MenuSaveSlots.draw(saveSlots, selectedSlot <= #saveSlots and selectedSlot or nil, bigFont, slotScale, {1, 1, 0}, {1, 1, 1})
+
+    local backY = 130 + (#saveSlots * (slotHeight + slotSpacing)) + 18
+    local backX = math.floor(vw / 2 - bigFont:getWidth(backButton.text, slotScale * 1.8) / 2)
+
+    if selectedSlot == totalItems then
+        love.graphics.setColor(1, 1, 0)
+    else
+        love.graphics.setColor(1, 1, 1)
+    end
+
+    bigFont:draw(backButton.text, backX, backY, slotScale * 1.8)
 
     autoscale.reset()
 end
 
 function selectsave.keypressed(key)
-    local current = buttons[selectedButton]
-    local function findInDirection(dx, dy)
-        local currentRow, currentCol = current.row, current.col
-        local cx = current.x
+    local sound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
 
-        if dx ~= 0 and dy == 0 then
-            local rowButtons = {}
-            for i, b in ipairs(buttons) do
-                if b.row == currentRow then
-                    table.insert(rowButtons, {index = i, col = b.col})
-                end
-            end
-            table.sort(rowButtons, function(a, b) return a.col < b.col end)
-
-            local pos
-            for i, b in ipairs(rowButtons) do
-                if b.col == currentCol then
-                    pos = i
-                    break
-                end
-            end
-            if not pos then return nil end
-
-            local nextPos = (pos - 1 + dx) % #rowButtons + 1
-            return rowButtons[nextPos].index
-        elseif dy ~= 0 and dx == 0 then
-            local targetRow = currentRow + dy
-            local candidates = {}
-            for i, b in ipairs(buttons) do
-                if b.row == targetRow then
-                    table.insert(candidates, {index = i, dist = math.abs(b.x - cx)})
-                end
-            end
-            if #candidates == 0 then return nil end
-            table.sort(candidates, function(a, b) return a.dist < b.dist end)
-            return candidates[1].index
-        end
-
-        return nil
-    end
-
-    if key == "right" then
-        selectedButton = findInDirection(1, 0) or selectedButton
-    elseif key == "left" then
-        selectedButton = findInDirection(-1, 0) or selectedButton
-    elseif key == "down" then
-        selectedButton = findInDirection(0, 1) or selectedButton
+    if key == "down" then
+        selectedSlot = selectedSlot % totalItems + 1
+        sound:play()
     elseif key == "up" then
-        selectedButton = findInDirection(0, -1) or selectedButton
+        selectedSlot = (selectedSlot - 2 + totalItems) % totalItems + 1
+        sound:play()
     elseif key == "return" or key == "z" then
         if love.keyboard.isDown("lalt", "ralt") then return end
-        QwertyButtons.activate(buttons, selectedButton)
+        if selectedSlot == totalItems then
+            backButton.callback()
+        else
+            MenuSaveSlots.activate(saveSlots, selectedSlot)
+        end
     end
 end
 

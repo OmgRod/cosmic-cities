@@ -55,6 +55,12 @@ buttons = createButtons()
 
 function options.update(dt)
     Starfield.update(dt)
+
+    local currentFullscreen = love.window.getFullscreen()
+    if currentFullscreen ~= prevFullscreen then
+        prevFullscreen = currentFullscreen
+        buttons = createButtons()
+    end
 end
 
 function options.draw()

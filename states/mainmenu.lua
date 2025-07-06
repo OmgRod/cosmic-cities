@@ -19,10 +19,10 @@ local logoScale = (vw * 0.8) / logo:getWidth()
 local logoHeight = logoY + logo:getHeight() * logoScale
 
 local buttons = MenuButtons.create({
-    { text = "Start", callback = function() state.switch("states/game") end },
+    { text = "Start", callback = function() state.switch("states/selectsave") end },
     { text = "Options", callback = function() state.switch("states/options") end },
     { text = "Credits", callback = function() state.switch("states/credits") end },
-    { text = "Test", callback = function() state.switch("states/selectsave") end },
+    { text = "Test", callback = function() state.switch("states/progression") end },
     { text = "Exit", callback = function() love.event.quit() end },
 }, bigFont, buttonFontScale, vw, vh, logoHeight, buttonSpacing)
 
