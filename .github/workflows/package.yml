@@ -67,7 +67,6 @@ jobs:
           if (-not (Test-Path $outputExePath)) {
             throw "Build failed: CosmicCities.exe not created."
           }
-          }
 
       - name: Place Game Source File
         shell: pwsh
