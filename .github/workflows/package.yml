@@ -57,4 +57,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CosmicCities-${{ matrix.config.arch }}
-          path: love/CosmicCities-${{ matrix.config.arch }}.zip
+          path: CosmicCities-${{ matrix.config.arch }}.zip
