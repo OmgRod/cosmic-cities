@@ -46,7 +46,7 @@ local function createButtons()
                 buttons = createButtons()
             end
         },
-        { text = "Easter Eggs", callback = function() state.switch("states/options/eastereggs") end },
+        { text = "Easter Eggs", callback = function() state.switch("states/optionsmenu/eastereggs") end },
         { text = "Back", callback = function() state.switch("states/mainmenu") end },
     }, bigFont, buttonScale, vw, vh, startY, buttonSpacing)
 end

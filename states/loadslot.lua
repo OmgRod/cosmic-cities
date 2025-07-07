@@ -28,7 +28,7 @@ function loadslot.update(dt)
     else
         timer = timer + dt
         if timer >= 0.6 then
-            state.switch("states/game;" .. saveName)
+            state.switch("states/game;" .. saveFile)
         end
     end
 end

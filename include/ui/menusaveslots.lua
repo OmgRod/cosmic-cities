@@ -2,6 +2,25 @@ local MenuSaveSlots = {}
 
 function MenuSaveSlots.create(slotDefs, font, fontScale, vw, vh, startY, spacing, slotWidth, slotHeight)
     local slots = {}
+
+    if #slotDefs == 0 then
+        local text = "Create New Save"
+        local textWidth = font:getWidth(text, fontScale)
+        local textHeight = font.lineHeight * fontScale
+        local x = (vw - textWidth) / 2
+        local y = (vh - textHeight) / 2
+
+        slots[1] = {
+            isEmpty = true,
+            x = x,
+            y = y,
+            text = text,
+            callback = nil
+        }
+
+        return slots
+    end
+
     local totalHeight = (#slotDefs * slotHeight) + ((#slotDefs - 1) * spacing)
     local offsetY = startY + (vh - startY - totalHeight) / 2
 
@@ -25,6 +44,12 @@ function MenuSaveSlots.create(slotDefs, font, fontScale, vw, vh, startY, spacing
 end
 
 function MenuSaveSlots.draw(slots, selectedIndex, font, fontScale, selectedColor, normalColor)
+    if slots[1] and slots[1].isEmpty then
+        love.graphics.setColor(1, 1, 1)
+        font:draw(slots[1].text, slots[1].x, slots[1].y, fontScale)
+        return
+    end
+
     for i, slot in ipairs(slots) do
         local color = (i == selectedIndex) and selectedColor or normalColor
 
@@ -45,6 +70,8 @@ function MenuSaveSlots.draw(slots, selectedIndex, font, fontScale, selectedColor
 end
 
 function MenuSaveSlots.getHoveredIndex(slots, mx, my)
+    if slots[1] and slots[1].isEmpty then return nil end
+
     for i, slot in ipairs(slots) do
         if mx >= slot.x and mx <= slot.x + slot.width and my >= slot.y and my <= slot.y + slot.height then
             return i
@@ -55,12 +82,13 @@ end
 
 function MenuSaveSlots.activate(slots, index)
     local slot = slots[index]
+    if not slot or slot.isEmpty then return end
 
     local n = love.math.random(1, 5)
     local sound = love.audio.newSource("assets/sounds/sfx.blip." .. n .. ".wav", "static")
     sound:play()
 
-    if slot and slot.callback then
+    if slot.callback then
         slot.callback()
     end
 end

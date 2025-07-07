@@ -13,18 +13,17 @@ local vw, vh = autoscale.getVirtualSize()
 Starfield.init(vw, vh)
 
 local buttonScale = 1
-
 local selectedButton = 1
 
-local buttonCount = 5
-
+local buttonCount = 2
 local buttonHeight = bigFont.lineHeight * buttonScale
 local buttonSpacing = 5
-
 local totalButtonsHeight = (buttonHeight * buttonCount) + (buttonSpacing * (buttonCount - 1))
 local startY = (vh / 2) - (totalButtonsHeight / 2) - 50
 
 local save = GameSaveManager.load("options.ini")
+
+local buttons
 
 local function createButtons()
     return MenuButtons.create({
@@ -33,6 +32,7 @@ local function createButtons()
             callback = function()
                 save:set("monthlies", not save:get("monthlies", "EasterEggs"), "EasterEggs")
                 buttons = createButtons()
+                selectedButton = 1
             end
         },
         { text = "Back", callback = function() state.switch("states/options") end },
@@ -62,7 +62,6 @@ function eastereggs.draw()
 
     if save:get("monthlies", "EasterEggs") then
         local month = tonumber(os.date("%m"))
-
         local sprite
 
         if month == 1 then
@@ -117,6 +116,11 @@ function eastereggs.keypressed(key)
         if love.keyboard.isDown("lalt", "ralt") then return end
         MenuButtons.activate(buttons, selectedButton)
     end
+end
+
+function eastereggs.enter()
+    selectedButton = 1
+    buttons = createButtons()
 end
 
 return eastereggs
