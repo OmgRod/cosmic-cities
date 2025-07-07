@@ -24,7 +24,6 @@ local buttons = MenuButtons.create({
 }, bigFont, backButtonScale, vw, vh, backButtonY, 0)
 
 function progression.draw()
-    autoscale.apply()
     love.graphics.clear(245 / 255, 81 / 255, 81 / 255, 1)
 
     local planetShadow = love.graphics.newImage("assets/sprites/CC_planetShadow_001.png")
@@ -34,8 +33,6 @@ function progression.draw()
     love.graphics.draw(planetShadow, planetX, planetY)
 
     MenuButtons.draw(buttons, selectedButton, bigFont, backButtonScale, {1, 1, 0}, {1, 1, 1})
-
-    autoscale.reset()
 end
 
 function progression.keypressed(key)

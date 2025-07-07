@@ -64,7 +64,6 @@ function options.update(dt)
 end
 
 function options.draw()
-    autoscale.apply()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
@@ -122,8 +121,6 @@ function options.draw()
             love.graphics.draw(sprite, x, y, 0)
         end
     end
-
-    autoscale.reset()
 end
 
 function options.keypressed(key)

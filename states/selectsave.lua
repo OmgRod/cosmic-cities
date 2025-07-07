@@ -68,7 +68,6 @@ function selectsave.update(dt)
 end
 
 function selectsave.draw()
-    autoscale.apply()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
@@ -93,8 +92,6 @@ function selectsave.draw()
     end
 
     bigFont:draw(backButton.text, backX, backY, slotScale * 1.8)
-
-    autoscale.reset()
 end
 
 function selectsave.keypressed(key)

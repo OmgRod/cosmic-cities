@@ -1,8 +1,3 @@
---[[
-PROGRAM BY: OmgRod
-All Rights Reserved
-]]
-
 local autoscale = {}
 
 local vw, vh = 640, 480

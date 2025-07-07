@@ -37,8 +37,6 @@ function loadslot.draw()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
-    autoscale.apply()
-
     Starfield.draw()
 
     love.graphics.setColor(1, 1, 1)
@@ -58,8 +56,6 @@ function loadslot.draw()
 
     love.graphics.setColor(0.3, 0.9, 0.3)
     love.graphics.rectangle("fill", barX, barY, barW * math.min(loadingProgress, 1), barH)
-
-    autoscale.reset()
 end
 
 return loadslot

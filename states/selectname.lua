@@ -75,7 +75,6 @@ local buttons = QwertyButtons.create(buttonDefs, bigFont, buttonScale)
 local selectedButton = 1
 
 function selectname.draw()
-    autoscale.apply()
     love.graphics.clear(245 / 255, 81 / 255, 81 / 255, 1)
 
     love.graphics.setColor(1, 1, 1)
@@ -84,8 +83,6 @@ function selectname.draw()
     bigFont:draw(typedText, labelX, labelY, buttonScale)
 
     QwertyButtons.draw(buttons, selectedButton, bigFont, buttonScale, {1, 1, 0}, {1, 1, 1})
-
-    autoscale.reset()
 end
 
 function selectname.keypressed(key)

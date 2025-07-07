@@ -31,14 +31,21 @@ function state.switch(stateName)
    end
    stateName = matches[1]
    matches[1] = nil
-   if (matches[2] ~= nil) then
-      for i, match in pairs(matches) do
+   if matches[2] ~= nil then
+      for i, match in ipairs(matches) do
          passvar[#passvar+1] = match
       end
    end
+
    package.loaded[stateName] = false
    state.name = stateName
-   state.current = require(stateName)
+
+   local modname = stateName:gsub("/", ".")
+   state.current = require(modname)
+
+   if type(state.current.load) == "function" then
+      state.current.load(unpack(passvar))
+   end
 
    local menuStates = {
       ["states/credits"] = true,

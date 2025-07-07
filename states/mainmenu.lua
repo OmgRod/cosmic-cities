@@ -36,16 +36,12 @@ function mainmenu.draw()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
-    autoscale.apply()
-
     Starfield.draw()
 
     love.graphics.setColor(1, 1, 1)
     love.graphics.draw(logo, vw * 0.1, logoY, 0, logoScale, logoScale)
 
     MenuButtons.draw(buttons, selectedButton, bigFont, buttonFontScale, {1, 1, 0}, {1, 1, 1})
-
-    autoscale.reset()
 end
 
 function mainmenu.keypressed(key, scancode, isrepeat)

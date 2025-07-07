@@ -46,7 +46,6 @@ function eastereggs.update(dt)
 end
 
 function eastereggs.draw()
-    autoscale.apply()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
@@ -104,8 +103,6 @@ function eastereggs.draw()
             love.graphics.draw(sprite, x, y, 0)
         end
     end
-
-    autoscale.reset()
 end
 
 function eastereggs.keypressed(key)

@@ -8,7 +8,7 @@ local GameSaveManager = require("include.gamesave")
 local escapeHoldTime = 0
 local escapeHeld = false
 
-local deltatime;
+local deltatime
 
 local quitFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 local quitDotCount = 0
@@ -64,6 +64,9 @@ end
 
 function love.resize(w, h)
     autoscale.resize(w, h)
+    if state.current.resize then
+        state.current.resize(w, h)
+    end
 end
 
 function love.draw()

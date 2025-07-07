@@ -29,7 +29,6 @@ function credits.update(dt)
 end
 
 function credits.draw()
-    autoscale.apply()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
@@ -57,8 +56,6 @@ function credits.draw()
     end
 
     MenuButtons.draw(buttons, selectedButton, bigFont, backButtonScale, {1, 1, 0}, {1, 1, 1})
-
-    autoscale.reset()
 end
 
 function credits.keypressed(key)
