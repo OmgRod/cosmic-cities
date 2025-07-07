@@ -27,69 +27,52 @@ THE SOFTWARE.
 local _PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
 local cos, sin = math.cos, math.sin
 
+local autoscale = require('include.autoscale')
+
 local camera = {}
 camera.__index = camera
 
--- Movement interpolators (for camera locking/windowing)
 camera.smooth = {}
 
 function camera.smooth.none()
-	return function(dx,dy) return dx,dy end
+	return function(dx, dy) return dx, dy end
 end
 
 function camera.smooth.linear(speed)
-	assert(type(speed) == "number", "Invalid parameter: speed = "..tostring(speed))
-	return function(dx,dy, s)
-		local d = math.sqrt(dx*dx+dy*dy)
+	assert(type(speed) == "number", "Invalid parameter: speed = " .. tostring(speed))
+	return function(dx, dy, s)
+		local d = math.sqrt(dx * dx + dy * dy)
 		local dts = math.min((s or speed) * love.timer.getDelta(), d)
 		if d > 0 then
-			dx,dy = dx/d, dy/d
+			dx, dy = dx / d, dy / d
 		end
-		return dx*dts, dy*dts
+		return dx * dts, dy * dts
 	end
 end
 
 function camera.smooth.damped(stiffness)
-	assert(type(stiffness) == "number", "Invalid parameter: stiffness = "..tostring(stiffness))
-	return function(dx,dy, s)
+	assert(type(stiffness) == "number", "Invalid parameter: stiffness = " .. tostring(stiffness))
+	return function(dx, dy, s)
 		local dts = love.timer.getDelta() * (s or stiffness)
-		return dx*dts, dy*dts
+		return dx * dts, dy * dts
 	end
 end
 
-local function new(x,y, zoom, rot, smoother)
-	x,y  = x or love.graphics.getWidth()/2, y or love.graphics.getHeight()/2
+local function new(x, y, zoom, rot, smoother)
+	local vw, vh = autoscale.getVirtualSize()
+	x, y = x or vw / 2, y or vh / 2
 	zoom = zoom or 1
-	rot  = rot or 0
+	rot = rot or 0
 	smoother = smoother or camera.smooth.none()
-	return setmetatable({
-		x = x, y = y,
-		scale = zoom, rot = rot,
-		smoother = smoother,
-		offsetX = 0, offsetY = 0, -- added offsets
-		scaleX = zoom, scaleY = zoom -- added separate scale for X and Y (start equal)
-	}, camera)
+	return setmetatable({x = x, y = y, scale = zoom, rot = rot, smoother = smoother}, camera)
 end
 
-function camera:setScale(sx, sy)
-	self.scaleX = sx or 1
-	self.scaleY = sy or sx or 1
-	self.scale = self.scaleX -- keep .scale for compatibility (use X scale)
-	return self
-end
-
-function camera:setOffset(ox, oy)
-	self.offsetX = ox or 0
-	self.offsetY = oy or 0
-	return self
-end
-
-function camera:lookAt(x,y)
+function camera:lookAt(x, y)
 	self.x, self.y = x, y
 	return self
 end
 
-function camera:move(dx,dy)
+function camera:move(dx, dy)
 	self.x, self.y = self.x + dx, self.y + dy
 	return self
 end
@@ -109,82 +92,79 @@ function camera:rotateTo(phi)
 end
 
 function camera:zoom(mul)
-	self.scaleX = self.scaleX * mul
-	self.scaleY = self.scaleY * mul
-	self.scale = self.scaleX
+	self.scale = self.scale * mul
 	return self
 end
 
 function camera:zoomTo(zoom)
-	self.scaleX = zoom
-	self.scaleY = zoom
 	self.scale = zoom
 	return self
 end
 
-function camera:attach(x,y,w,h,noclip)
-	x,y = x or 0, y or 0
-	w,h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
+function camera:attach(x, y, w, h, noclip)
+	x, y = x or 0, y or 0
+	local vw, vh = autoscale.getVirtualSize()
+	w, h = w or vw, h or vh
 
-	self._sx,self._sy,self._sw,self._sh = love.graphics.getScissor()
+	self._sx, self._sy, self._sw, self._sh = love.graphics.getScissor()
 	if not noclip then
-		love.graphics.setScissor(x,y,w,h)
+		love.graphics.setScissor(x, y, w, h)
 	end
 
-	local cx,cy = x+w/2, y+h/2
+	local cx, cy = x + w / 2, y + h / 2
 	love.graphics.push()
-	love.graphics.translate(self.offsetX + cx, self.offsetY + cy)
-	love.graphics.scale(self.scaleX, self.scaleY)
+	love.graphics.translate(cx, cy)
+	love.graphics.scale(self.scale)
 	love.graphics.rotate(self.rot)
 	love.graphics.translate(-self.x, -self.y)
 end
 
 function camera:detach()
 	love.graphics.pop()
-	love.graphics.setScissor(self._sx,self._sy,self._sw,self._sh)
+	love.graphics.setScissor(self._sx, self._sy, self._sw, self._sh)
 end
 
 function camera:draw(...)
-	local x,y,w,h,noclip,func
+	local x, y, w, h, noclip, func
 	local nargs = select("#", ...)
 	if nargs == 1 then
 		func = ...
 	elseif nargs == 5 then
-		x,y,w,h,func = ...
+		x, y, w, h, func = ...
 	elseif nargs == 6 then
-		x,y,w,h,noclip,func = ...
+		x, y, w, h, noclip, func = ...
 	else
 		error("Invalid arguments to camera:draw()")
 	end
 
-	self:attach(x,y,w,h,noclip)
+	self:attach(x, y, w, h, noclip)
 	func()
 	self:detach()
 end
 
-function camera:cameraCoords(x,y, ox,oy,w,h)
-	ox, oy = ox or 0, oy or 0
-	w,h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
-
-	local c,s = cos(self.rot), sin(self.rot)
-	x,y = x - self.x, y - self.y
-	x,y = c*x - s*y, s*x + c*y
-	return x*self.scaleX + w/2 + ox + (self.offsetX or 0), y*self.scaleY + h/2 + oy + (self.offsetY or 0)
+function camera:cameraCoords(x, y)
+	local vw, vh = autoscale.getVirtualSize()
+	local c, s = cos(self.rot), sin(self.rot)
+	x, y = x - self.x, y - self.y
+	x, y = c * x - s * y, s * x + c * y
+	return x * self.scale + vw / 2, y * self.scale + vh / 2
 end
 
-function camera:worldCoords(x,y, ox,oy,w,h)
-	ox, oy = ox or 0, oy or 0
-	w,h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
-
-	local c,s = cos(-self.rot), sin(-self.rot)
-	x,y = (x - w/2 - ox - (self.offsetX or 0)) / self.scaleX, (y - h/2 - oy - (self.offsetY or 0)) / self.scaleY
-	x,y = c*x - s*y, s*x + c*y
-	return x+self.x, y+self.y
+function camera:worldCoords(x, y)
+	local vw, vh = autoscale.getVirtualSize()
+	local c, s = cos(-self.rot), sin(-self.rot)
+	x, y = (x - vw / 2) / self.scale, (y - vh / 2) / self.scale
+	x, y = c * x - s * y, s * x + c * y
+	return x + self.x, y + self.y
 end
 
-function camera:mousePosition(ox,oy,w,h)
-	local mx,my = love.mouse.getPosition()
-	return self:worldCoords(mx,my, ox,oy,w,h)
+function camera:mousePosition()
+	local mx, my = love.mouse.getPosition()
+	local ox, oy = autoscale.getOffset()
+	local scale = autoscale.getScale()
+	mx = (mx - ox) / scale
+	my = (my - oy) / scale
+	return self:worldCoords(mx, my)
 end
 
 function camera:lockX(x, smoother, ...)
@@ -199,29 +179,22 @@ function camera:lockY(y, smoother, ...)
 	return self
 end
 
-function camera:lockPosition(x,y, smoother, ...)
+function camera:lockPosition(x, y, smoother, ...)
 	return self:move((smoother or self.smoother)(x - self.x, y - self.y, ...))
 end
 
 function camera:lockWindow(x, y, x_min, x_max, y_min, y_max, smoother, ...)
-	x,y = self:cameraCoords(x,y)
-	local dx, dy = 0,0
-	if x < x_min then
-		dx = x - x_min
-	elseif x > x_max then
-		dx = x - x_max
-	end
-	if y < y_min then
-		dy = y - y_min
-	elseif y > y_max then
-		dy = y - y_max
-	end
+	x, y = self:cameraCoords(x, y)
+	local dx, dy = 0, 0
+	if x < x_min then dx = x - x_min elseif x > x_max then dx = x - x_max end
+	if y < y_min then dy = y - y_min elseif y > y_max then dy = y - y_max end
 
-	local c,s = cos(-self.rot), sin(-self.rot)
-	dx,dy = (c*dx - s*dy) / self.scaleX, (s*dx + c*dy) / self.scaleY
+	local c, s = cos(-self.rot), sin(-self.rot)
+	dx, dy = (c * dx - s * dy) / self.scale, (s * dx + c * dy) / self.scale
 
-	self:move((smoother or self.smoother)(dx,dy,...))
+	self:move((smoother or self.smoother)(dx, dy, ...))
 end
 
-return setmetatable({new = new, smooth = camera.smooth},
-	{__call = function(_, ...) return new(...) end})
+return setmetatable({new = new, smooth = camera.smooth}, {
+	__call = function(_, ...) return new(...) end
+})
