@@ -4,6 +4,7 @@ local fntparser = require("include.fntparser")
 local SpriteFont = require("include.spritefont")
 local flux = require("include.flux")
 local GameSaveManager = require("include.gamesave")
+local musicmanager = require("include.musicmanager")
 
 local escapeHoldTime = 0
 local escapeHeld = false
@@ -74,6 +75,7 @@ function love.load()
     autoscale.resize(love.graphics.getDimensions())
 
     save = GameSaveManager.load("options.ini")
+    musicmanager.load("intro", "assets/sounds/music.intro.wav", "stream")
 
     state.switch("states/mainmenu")
 end
@@ -84,24 +86,16 @@ function love.update(dt)
 
     if escapeHeld then
         escapeHoldTime = escapeHoldTime + dt
-        if escapeHoldTime >= 2 and not quitting then
-            quitting = true
-            quitDotCount = 0
-            quitDotTimer = 0
-            flux.to(_G, 1/3, { quitFade = 1 }):ease("quadout")
-        end
-    end
 
-    if quitting then
         quitDotTimer = quitDotTimer + dt
-        if quitDotTimer >= 1 then
-            quitDotTimer = quitDotTimer - 1
-            quitDotCount = (quitDotCount % 3) + 1
+        if quitDotCount < 4 and quitDotTimer >= 0.5 then
+            quitDotTimer = quitDotTimer - 0.5
+            quitDotCount = quitDotCount + 1
         end
-    end
 
-    if quitting and escapeHoldTime >= 5 then
-        love.event.quit()
+        if quitDotCount == 4 then
+            love.event.quit()
+        end
     end
 
     if state.current.update then
@@ -132,13 +126,13 @@ function love.draw()
         local text = "Quitting" .. dots
         local scale = 1.5
         local x = 5
-        local y = (GameSaveManager.load("options.ini"):get("fps", "Options") == true or GameSaveManager.load("options.ini"):get("fps", "Options") == "true") and 45 or 5
+        local y = (GameSaveManager.load("options.ini"):get("fps", "Miscellaneous") == true or GameSaveManager.load("options.ini"):get("fps", "Miscellaneous") == "true") and 45 or 5
 
         love.graphics.setColor(1, 1, 1, quitFade)
         quitFont:draw(text, x, y, scale)
     end
 
-    local rawFps = GameSaveManager.load("options.ini"):get("fps", "Options")
+    local rawFps = GameSaveManager.load("options.ini"):get("fps", "Miscellaneous")
     local showFps = rawFps == true or rawFps == "true"
 
     if showFps then
@@ -173,14 +167,15 @@ function love.keypressed(key, scancode, isrepeat)
         love.window.setFullscreen(not isFullscreen)
     end
 
-    if key == "escape" then
+    if key == "escape" and not escapeHeld then
         escapeHeld = true
         escapeHoldTime = 0
-        quitting = false
+        quitting = true
         quitDotCount = 0
         quitDotTimer = 0
         quitFade = 0
         flux.remove(_G, "quitFade")
+        flux.to(_G, 1, { quitFade = 1 }):ease("quadout")
     end
 
     if state.current.keypressed then

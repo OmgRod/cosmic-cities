@@ -41,7 +41,7 @@ function credits.draw()
     local titleY = math.floor(50)
     bigFont:draw(title, titleX, titleY, scaleBig)
 
-    local text = "Lead Developer - OmgRod\nCharacter Art - Caz Wolf\nSFX - Bfxr"
+    local text = "Lead Developer - OmgRod\nCharacter Art - Caz Wolf\nMusic - PumpkinSmarty\nSFX - Bfxr"
     local lines = {}
     for line in text:gmatch("[^\n]+") do
         table.insert(lines, line)

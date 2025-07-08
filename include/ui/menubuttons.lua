@@ -37,7 +37,7 @@ function MenuButtons.create(buttonDefs, font, fontScale, vw, vh, logoHeight, spa
     buttons.buttonHeight = buttonHeight
     buttons.spacing = spacing
     buttons.totalHeight = totalButtonsHeight
-    buttons.scrollBounds = scrollBounds or {top = startY, bottom = vh} -- default bounds
+    buttons.scrollBounds = scrollBounds or {top = startY, bottom = vh}
 
     return buttons
 end
@@ -55,16 +55,11 @@ function MenuButtons.updateScroll(buttons, selectedIndex)
     local spacing = buttons.spacing
     local totalHeight = buttons.totalHeight
 
-    -- Calculate the button's center y relative to current scroll
     local btnCenterY = btn.y - scrollOffset + buttonHeight / 2
-
-    -- Calculate the middle of the bounds where we want to center the button ideally
     local boundsCenter = (bounds.top + bounds.bottom) / 2
 
-    -- Desired scroll offset to center the selected button within bounds
     local desiredScrollOffset = btn.y + buttonHeight / 2 - boundsCenter
 
-    -- Clamp scrollOffset so that we don't scroll past the content edges
     local maxScroll = math.max(0, totalHeight - (bounds.bottom - bounds.top))
     if desiredScrollOffset < 0 then
         desiredScrollOffset = 0
@@ -87,7 +82,7 @@ function MenuButtons.draw(buttons, selectedIndex, font, fontScale, selectedColor
         end
         font:draw(btn.text, btn.x, drawY, fontScale)
     end
-    love.graphics.setColor(1, 1, 1) -- reset color after drawing
+    love.graphics.setColor(1, 1, 1)
 end
 
 function MenuButtons.getHoveredIndex(buttons, mx, my)

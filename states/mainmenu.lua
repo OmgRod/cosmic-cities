@@ -3,6 +3,7 @@ local autoscale = require("include.autoscale")
 local Starfield = require("include.background.starfield")
 local SpriteFont = require("include.spritefont")
 local MenuButtons = require("include.ui.menubuttons")
+local musicmanager = require("include.musicmanager")
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 local mainmenu = {}
@@ -29,6 +30,12 @@ local buttons = MenuButtons.create({
 MenuButtons.updateScroll(buttons, selectedButton, vh)
 
 local selectSound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
+
+function mainmenu.load()
+    if musicmanager.getCurrent() ~= "intro" then
+        musicmanager.play("intro", true)
+    end
+end
 
 function mainmenu.update(dt)
     Starfield.update(dt)

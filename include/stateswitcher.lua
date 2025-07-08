@@ -18,9 +18,7 @@ passvar = {}
 
 state = {
    current = {},
-   name = "",
-   music = nil,
-   musicId = nil
+   name = ""
 }
 
 function state.switch(stateName)
@@ -45,34 +43,6 @@ function state.switch(stateName)
 
    if type(state.current.load) == "function" then
       state.current.load(unpack(passvar))
-   end
-
-   local menuStates = {
-      ["states/credits"] = true,
-      ["states/options"] = true,
-      ["states/options/eastereggs"] = true,
-      ["states/mainmenu"] = true,
-      ["states/selectsave"] = true
-   }
-
-   if menuStates[stateName] then
-      if state.music == nil or state.musicId ~= "intro" then
-         if state.music and state.music:isPlaying() then
-            state.music:stop()
-         end
-         state.music = love.audio.newSource("assets/sounds/music.intro.wav", "stream")
-         state.music:setLooping(true)
-         state.music:play()
-         state.musicId = "intro"
-      elseif not state.music:isPlaying() then
-         state.music:play()
-      end
-   else
-      if state.music and state.music:isPlaying() and state.musicId == "intro" then
-         state.music:stop()
-         state.music = nil
-         state.musicId = nil
-      end
    end
 end
 
