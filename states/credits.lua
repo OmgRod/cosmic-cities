@@ -38,7 +38,7 @@ function credits.draw()
     local title = "Credits"
     local scaleBig = 2
     local titleX = math.floor(320 - (bigFont:getWidth(title, scaleBig) / 2))
-    local titleY = math.floor(50)
+    local titleY = 80
     bigFont:draw(title, titleX, titleY, scaleBig)
 
     local text = "Lead Developer - OmgRod\nCharacter Art - Caz Wolf\nPixel Art - OmgRod\nMusic - PumpkinSmarty\nSFX - Bfxr"
@@ -46,12 +46,13 @@ function credits.draw()
     for line in text:gmatch("[^\n]+") do
         table.insert(lines, line)
     end
-    local startY = math.floor(240)
+    local startY = math.floor(titleY + bigFont.lineHeight * scaleBig + 20)
     local scaleSmall = 1
+    local lineSpacing = 6
     for i, line in ipairs(lines) do
         local lineWidth = smallFont:getWidth(line, scaleSmall)
         local x = math.floor(320 - (lineWidth / 2))
-        local y = math.floor(startY + (i - 1) * smallFont.lineHeight * scaleSmall)
+        local y = math.floor(startY + (i - 1) * (smallFont.lineHeight * scaleSmall + lineSpacing))
         smallFont:draw(line, x, y, scaleSmall)
     end
 
