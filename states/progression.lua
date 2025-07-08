@@ -21,22 +21,45 @@ local buttons = MenuButtons.create({
     { text = "Back", callback = function() state.switch("states/mainmenu") end },
 }, bigFont, backButtonScale, vw, vh, backButtonY, 0)
 
-local planetX, planetY = 50, 50
-local asteroidX, asteroidY = 150, 250
+local planetImage = love.graphics.newImage("assets/sprites/CC_planetShadow_001.png")
+local asteroidImage = love.graphics.newImage("assets/sprites/CC_asteroidShadow_001.png")
+local planetX, planetY = 100, 100
+local asteroidX, asteroidY = 300, 300
 
 local dots = {}
 
+local function getClosestEdgePoints(imageA, x1, y1, imageB, x2, y2)
+    local w1, h1 = imageA:getWidth(), imageA:getHeight()
+    local w2, h2 = imageB:getWidth(), imageB:getHeight()
+
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local len = math.sqrt(dx * dx + dy * dy)
+    if len == 0 then
+        return x1, y1, x2, y2
+    end
+
+    local ux, uy = dx / len, dy / len
+
+    local edgeA_x = x1 + (w1 / 2) * ux
+    local edgeA_y = y1 + (h1 / 2) * uy
+
+    local edgeB_x = x2 - (w2 / 2) * ux
+    local edgeB_y = y2 - (h2 / 2) * uy
+
+    return edgeA_x, edgeA_y, edgeB_x, edgeB_y
+end
+
 local function generateWaddleDots()
-    local count = 5
-    for i = 1, count do
-        local t = i / (count + 1)
-        local x = planetX + (asteroidX - planetX) * t
-        local y = planetY + (asteroidY - planetY) * t
-
-        local wobbleX = love.math.random(-5, 5)
-        local wobbleY = love.math.random(-5, 5)
-
-        table.insert(dots, { x = x + wobbleX, y = y + wobbleY })
+    local startX, startY, endX, endY = getClosestEdgePoints(planetImage, planetX, planetY, asteroidImage, asteroidX, asteroidY)
+    dots = {}
+    for i = 1, 5 do
+        local t = i / 6
+        local x = startX + (endX - startX) * t
+        local y = startY + (endY - startY) * t
+        x = x + love.math.random(-3, 3)
+        y = y + love.math.random(-3, 3)
+        table.insert(dots, { x = x, y = y })
     end
 end
 
@@ -45,13 +68,9 @@ generateWaddleDots()
 function progression.draw()
     love.graphics.clear(245 / 255, 81 / 255, 81 / 255, 1)
 
-    local planetShadow = love.graphics.newImage("assets/sprites/CC_planetShadow_001.png")
     love.graphics.setColor(128 / 255, 42 / 255, 42 / 255, 1)
-    love.graphics.draw(planetShadow, planetX, planetY)
-
-    local asteroidShadow = love.graphics.newImage("assets/sprites/CC_asteroidShadow_001.png")
-    love.graphics.setColor(128 / 255, 42 / 255, 42 / 255, 1)
-    love.graphics.draw(asteroidShadow, asteroidX, asteroidY)
+    love.graphics.draw(planetImage, planetX, planetY)
+    love.graphics.draw(asteroidImage, asteroidX, asteroidY)
 
     love.graphics.setColor(1, 1, 1)
     for _, dot in ipairs(dots) do
@@ -63,9 +82,9 @@ end
 
 function progression.keypressed(key)
     if key == "down" then
-       selectedButton = selectedButton % #buttons + 1
+        selectedButton = selectedButton % #buttons + 1
     elseif key == "up" then
-       selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
+        selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
     elseif key == "return" or key == "z" then
         if love.keyboard.isDown("lalt", "ralt") then return end
         MenuButtons.activate(buttons, selectedButton)

@@ -20,6 +20,55 @@ local vw, vh = autoscale.getVirtualSize()
 
 local save
 
+local notificationSprite = nil
+local notificationX = vw
+local notificationY = -100
+local notificationTimer = 0
+local notificationActive = false
+
+function notifySprite(sprite)
+    notificationSprite = sprite
+    notificationX = vw
+    notificationY = -100
+    notificationTimer = 0
+    notificationActive = true
+
+    flux.to(_G, 0.5, { notificationX = vw - sprite:getWidth() - 10, notificationY = 10 }):ease("quadout")
+    flux.after(_G, 3, {}):oncomplete(function()
+        flux.to(_G, 0.5, { notificationY = -100 }):ease("quadin"):oncomplete(function()
+            notificationActive = false
+            notificationSprite = nil
+        end)
+    end)
+end
+
+function generateTextSprite(text)
+    local font = love.graphics.newFont(16)
+    local w = font:getWidth(text)
+    local h = font:getHeight()
+    local canvas = love.graphics.newCanvas(w + 20, h + 20)
+
+    love.graphics.setCanvas(canvas)
+    love.graphics.clear(0, 0, 0, 0)
+    love.graphics.setFont(font)
+    love.graphics.setColor(0.1, 0.1, 0.1, 0.8)
+    love.graphics.rectangle("fill", 0, 0, canvas:getWidth(), canvas:getHeight(), 8, 8)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print(text, 10, 10)
+    love.graphics.setCanvas()
+
+    return love.graphics.newImage(canvas:newImageData())
+end
+
+function love.joystickadded(joystick)
+    if joystick:isGamepad() then
+        local name = joystick:getName()
+        local message = "Gamepad connected: " .. name
+        local textSprite = generateTextSprite(message)
+        notifySprite(textSprite)
+    end
+end
+
 function love.load()
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
@@ -31,7 +80,6 @@ end
 
 function love.update(dt)
     flux.update(dt)
-
     deltatime = dt
 
     if escapeHeld then
@@ -40,7 +88,6 @@ function love.update(dt)
             quitting = true
             quitDotCount = 0
             quitDotTimer = 0
-
             flux.to(_G, 1/3, { quitFade = 1 }):ease("quadout")
         end
     end
@@ -64,6 +111,7 @@ end
 
 function love.resize(w, h)
     autoscale.resize(w, h)
+    vw, vh = autoscale.getVirtualSize()
     if state.current.resize then
         state.current.resize(w, h)
     end
@@ -109,6 +157,11 @@ function love.draw()
 
         love.graphics.setColor(1, 1, 1)
         quitFont:draw(text, x, y, scale)
+    end
+
+    if notificationActive and notificationSprite then
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(notificationSprite, notificationX, notificationY)
     end
 
     love.graphics.setColor(1, 1, 1, 1)

@@ -5,7 +5,7 @@ local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
 local GameSaveManager = require("include.gamesave")
 
-local options = {}
+local keybinds = {}
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 
@@ -13,65 +13,42 @@ local vw, vh = autoscale.getVirtualSize()
 Starfield.init(vw, vh)
 
 local buttonScale = 1
-
 local selectedButton = 1
 
-local buttonCount = 5
-
+local buttonCount = 2
 local buttonHeight = bigFont.lineHeight * buttonScale
 local buttonSpacing = 5
-
 local totalButtonsHeight = (buttonHeight * buttonCount) + (buttonSpacing * (buttonCount - 1))
 local startY = (vh / 2) - (totalButtonsHeight / 2) - 50
 
-local save
+local save = GameSaveManager.load("options.ini")
 
-function options.loadSave(filename)
-    save = GameSaveManager.load(filename or "options.ini")
-end
-
-options.loadSave()
+local buttons
 
 local function createButtons()
     return MenuButtons.create({
-        { text = "Fullscreen: " .. (love.window.getFullscreen() and "On" or "Off"), callback = function() 
-            love.window.setFullscreen(not love.window.getFullscreen()) 
-            buttons = createButtons()
-        end },
-        {
-            text = "Show FPS: " .. ((save:get("fps", "Options") and "On") or "Off"), 
-            callback = function()
-                save:set("fps", not save:get("fps", "Options"), "Options")
-                save:save("options.ini")
-                buttons = createButtons()
-            end
-        },
-        { text = "Keybinds", callback = function() state.switch("states/optionsmenu/keybinds") end },
-        { text = "Easter Eggs", callback = function() state.switch("states/optionsmenu/eastereggs") end },
-        { text = "Back", callback = function() state.switch("states/mainmenu") end },
+        { text = "Walk Up: " .. ((save:get("walkup", "Keybinds") and "On") or "Off"), callback = function() end },
+        { text = "Walk Down: " .. ((save:get("walkdown", "Keybinds") and "On") or "Off"), callback = function() end },
+        { text = "Walk Left: " .. ((save:get("walkleft", "Keybinds") and "On") or "Off"), callback = function() end },
+        { text = "Walk Right: " .. ((save:get("walkright", "Keybinds") and "On") or "Off"), callback = function() end },
+        { text = "Back", callback = function() state.switch("states/options") end },
     }, bigFont, buttonScale, vw, vh, startY, buttonSpacing)
 end
 
 buttons = createButtons()
 
-function options.update(dt)
+function keybinds.update(dt)
     Starfield.update(dt)
-
-    local currentFullscreen = love.window.getFullscreen()
-    if currentFullscreen ~= prevFullscreen then
-        prevFullscreen = currentFullscreen
-        buttons = createButtons()
-    end
 end
 
-function options.draw()
+function keybinds.draw()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
     Starfield.draw()
 
     love.graphics.setColor(1, 1, 1)
-    local title = "Options"
+    local title = "Keybinds"
     local scaleBig = 2
     local titleX = math.floor(vw / 2 - bigFont:getWidth(title, scaleBig) / 2)
     local titleY = 50
@@ -81,7 +58,6 @@ function options.draw()
 
     if save:get("monthlies", "EasterEggs") then
         local month = tonumber(os.date("%m"))
-
         local sprite
 
         if month == 1 then
@@ -124,7 +100,7 @@ function options.draw()
     end
 end
 
-function options.keypressed(key)
+function keybinds.keypressed(key)
     local sound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
     if key == "down" then
         selectedButton = selectedButton % #buttons + 1
@@ -138,4 +114,9 @@ function options.keypressed(key)
     end
 end
 
-return options
+function keybinds.enter()
+    selectedButton = 1
+    buttons = createButtons()
+end
+
+return keybinds

@@ -26,6 +26,8 @@ local buttons = MenuButtons.create({
     { text = "Exit", callback = function() love.event.quit() end },
 }, bigFont, buttonFontScale, vw, vh, logoHeight, buttonSpacing)
 
+MenuButtons.updateScroll(buttons, selectedButton, vh)
+
 local selectSound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
 
 function mainmenu.update(dt)
@@ -48,9 +50,11 @@ function mainmenu.keypressed(key, scancode, isrepeat)
     if key == "down" then
         selectedButton = selectedButton % #buttons + 1
         selectSound:play()
+        MenuButtons.updateScroll(buttons, selectedButton, vh)
     elseif key == "up" then
         selectedButton = (selectedButton - 2 + #buttons) % #buttons + 1
         selectSound:play()
+        MenuButtons.updateScroll(buttons, selectedButton, vh)
     elseif key == "return" or key == "z" then
         if love.keyboard.isDown("lalt", "ralt") then return end
         MenuButtons.activate(buttons, selectedButton)
