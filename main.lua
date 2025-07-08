@@ -1,10 +1,76 @@
 state = require("include.stateswitcher")
 autoscale = require("include.autoscale")
-local fntparser = require("include.fntparser")
 local SpriteFont = require("include.spritefont")
 local flux = require("include.flux")
 local GameSaveManager = require("include.gamesave")
 local musicmanager = require("include.musicmanager")
+local steam
+
+if love.system.getOS() == "Windows" then
+    if jit.arch == "x64" then
+        local dll_path = "bin/win64"
+
+        local ffi = require("ffi")
+        ffi.cdef [[ int _putenv(const char *envstring); ]]
+        local current_path = os.getenv("PATH") or ""
+        ffi.C._putenv("PATH=" .. current_path .. ";" .. dll_path)
+
+        package.cpath = package.cpath .. ";" .. dll_path .. "/?.dll"
+
+        steam = require("luasteam")
+        steam.init()
+    else
+        local dll_path = "bin/win32"
+
+        local ffi = require("ffi")
+        ffi.cdef [[ int _putenv(const char *envstring); ]]
+        local current_path = os.getenv("PATH") or ""
+        ffi.C._putenv("PATH=" .. current_path .. ";" .. dll_path)
+
+        package.cpath = package.cpath .. ";" .. dll_path .. "/?.dll"
+
+        steam = require("luasteam")
+        steam.init()
+    end
+elseif love.system.getOS() == "Linux" then
+    if jit.arch == "x64" then
+        local dll_path = "bin/linux64"
+
+        local ffi = require("ffi")
+        ffi.cdef [[ int _putenv(const char *envstring); ]]
+        local current_path = os.getenv("PATH") or ""
+        ffi.C._putenv("PATH=" .. current_path .. ";" .. dll_path)
+
+        package.cpath = package.cpath .. ";" .. dll_path .. "/?.dll"
+
+        steam = require("luasteam")
+        steam.init()
+    else
+        local dll_path = "bin/linux32"
+
+        local ffi = require("ffi")
+        ffi.cdef [[ int _putenv(const char *envstring); ]]
+        local current_path = os.getenv("PATH") or ""
+        ffi.C._putenv("PATH=" .. current_path .. ";" .. dll_path)
+
+        package.cpath = package.cpath .. ";" .. dll_path .. "/?.dll"
+
+        steam = require("luasteam")
+        steam.init()
+    end
+elseif love.system.getOS() == "OS X" then
+    local dll_path = "bin/osx"
+
+    local ffi = require("ffi")
+    ffi.cdef [[ int _putenv(const char *envstring); ]]
+    local current_path = os.getenv("PATH") or ""
+    ffi.C._putenv("PATH=" .. current_path .. ";" .. dll_path)
+
+    package.cpath = package.cpath .. ";" .. dll_path .. "/?.dll"
+
+    steam = require("luasteam")
+    steam.init()
+end
 
 local escapeHoldTime = 0
 local escapeHeld = false
