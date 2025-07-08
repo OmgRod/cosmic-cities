@@ -22,6 +22,7 @@ function SaveFile:load()
     self.data = {}
     return false
   end
+
   local success, result = pcall(LIP.load, self.filename)
   if success and type(result) == "table" then
     self.data = result
@@ -47,20 +48,18 @@ function SaveFile:getGroup(group)
   if group then
     self.data[group] = self.data[group] or {}
     return self.data[group]
-  else
-    return self.data
   end
+  return self.data
+end
+
+function SaveFile:get(key, group)
+  local target = self:getGroup(group)
+  return target and target[key] or nil
 end
 
 function SaveFile:set(key, value, group)
   local target = self:getGroup(group)
   target[key] = value
-  return self:save()
-end
-
-function SaveFile:get(key, group)
-  local target = self:getGroup(group)
-  return target[key]
 end
 
 function SaveFile:removeKey(key, group)
@@ -91,8 +90,19 @@ function SaveFile:exists()
   return love.filesystem.getInfo(self.filename) ~= nil
 end
 
+function SaveFile:setAndSave(key, value, group)
+  self:set(key, value, group)
+  return self:save()
+end
+
 function GameSaveManager.load(filename)
   return SaveFile.new(filename)
+end
+
+function GameSaveManager.create(filename)
+  local save = SaveFile.new(filename)
+  save:save()
+  return save
 end
 
 return GameSaveManager

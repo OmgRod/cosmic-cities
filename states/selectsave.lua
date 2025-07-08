@@ -18,8 +18,6 @@ local slotWidth = 360
 local slotHeight = 85
 local startY = 110
 
-local save = GameSaveManager.load("selectsave.ini")
-
 local saveSlots
 
 local backButton = {
@@ -43,23 +41,38 @@ local function createSlots()
     for i = 1, 3 do
         local filename = "save" .. i .. ".ini"
         local s = GameSaveManager.load(filename)
-        local playerName = s:get("playerName", "Meta") or "Unknown"
-        local timePlayed = tonumber(s:get("time", "Meta")) or 0
 
-        table.insert(slots, {
-            slotName = "Slot " .. i,
-            playtime = formatTime(timePlayed),
-            playerName = playerName,
-            callback = function()
-                state.switch("states/loadslot;slot_" .. tostring(i))
-            end
-        })
+        if s and s.data and next(s.data) then
+            local playername = (s.get and (s:get("playername", "Meta") or s:get("playername"))) or "Unknown"
+            local timePlayedRaw = (s.get and (s:get("time", "Meta") or s:get("time"))) or "0"
+            local timePlayed = tonumber(timePlayedRaw) or 0
+
+            slots[i] = {
+                slotName = "Slot " .. i,
+                playtime = formatTime(timePlayed),
+                playername = playername,
+                callback = function()
+                    state.switch("states/loadslot;slot_" .. i)
+                end,
+                isEmpty = false
+            }
+        else
+            slots[i] = {
+                slotName = "Slot " .. i,
+                playtime = "",
+                playername = "Create New Save",
+                callback = function()
+                    state.switch("states/loadslot;slot_" .. i)
+                end,
+                isEmpty = true
+            }
+        end
     end
 
-    return MenuSaveSlots.create(slots, bigFont, slotScale, vw, vh, startY, slotSpacing, slotWidth, slotHeight)
+    return slots
 end
 
-saveSlots = createSlots()
+saveSlots = MenuSaveSlots.create(createSlots(), bigFont, slotScale, vw, vh, startY, slotSpacing, slotWidth, slotHeight)
 
 local totalItems = #saveSlots + 1
 

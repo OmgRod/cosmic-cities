@@ -35,7 +35,7 @@ function MenuSaveSlots.create(slotDefs, font, fontScale, vw, vh, startY, spacing
             height = slotHeight,
             slotName = def.slotName or ("Slot " .. i),
             playtime = def.playtime or "00:00:00",
-            playerName = def.playerName or "Unknown",
+            playerName = def.playername or def.playerName or "Unknown",
             callback = def.callback
         }
     end

@@ -14,6 +14,7 @@ function QwertyButtons.create(defs, font, scale)
         end
         buttons[i] = {
             text = def.text,
+            origText = def.text,
             image = def.image,
             x = def.x,
             y = def.y,
@@ -24,7 +25,25 @@ function QwertyButtons.create(defs, font, scale)
             callback = def.callback
         }
     end
+    buttons.uppercase = false
     return buttons
+end
+
+function QwertyButtons.setUppercase(buttons, isUpper)
+    buttons.uppercase = isUpper
+    for _, button in ipairs(buttons) do
+        if button.origText then
+            if buttons.uppercase then
+                button.text = button.origText:upper()
+            else
+                button.text = button.origText:lower()
+            end
+        end
+    end
+end
+
+function QwertyButtons.toggleCase(buttons)
+    QwertyButtons.setUppercase(buttons, not buttons.uppercase)
 end
 
 function QwertyButtons.draw(buttons, selected, font, scale, highlightColor, defaultColor)
@@ -40,7 +59,10 @@ function QwertyButtons.draw(buttons, selected, font, scale, highlightColor, defa
             local drawY = button.y - (img:getHeight() * imgScale) / 2
             love.graphics.draw(img, drawX, drawY, 0, imgScale, imgScale)
         elseif button.text and button.text ~= "" then
-            font:draw(button.text, button.x, button.y, scale)
+            local textWidth = font:getWidth(button.text, scale)
+            local textX = button.x - textWidth / 2
+            local textY = button.y
+            font:draw(button.text, textX, textY, scale)
         end
     end
     love.graphics.setColor(1, 1, 1, 1)

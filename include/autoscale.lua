@@ -26,7 +26,7 @@ function autoscale.apply()
     if isApplied then return end
     isApplied = true
     love.graphics.setCanvas(canvas)
-    love.graphics.clear(0, 0, 0, 1) -- alpha=1 fix to avoid transparency artifacts
+    love.graphics.clear(0, 0, 0, 1)
     love.graphics.push()
     love.graphics.origin()
 end

@@ -1,19 +1,3 @@
---[[
-State switcher class: stateswitcher.lua
-Author: Daniel Duris, (CC-BY) 2014
-dusoft[at]staznosti.sk
-http://www.ambience.sk
-
-License: CC-BY 4.0
-This work is licensed under the Creative Commons Attribution 4.0
-International License. To view a copy of this license, visit
-http://creativecommons.org/licenses/by/4.0/ or send a letter to
-Creative Commons, 444 Castro Street, Suite 900, Mountain View,
-California, 94041, USA.
-
-Modified by OmgRod
-]]--
-
 passvar = {}
 
 state = {
@@ -21,24 +5,45 @@ state = {
    name = ""
 }
 
+local function forceUnloadModule(mod)
+   local dotname = mod:gsub("/", ".")
+   print("[StateSwitcher] Unloading modules:", mod, dotname)
+
+   package.loaded[mod] = nil
+   package.loaded[dotname] = nil
+   _G[dotname] = nil
+   _G[mod] = nil
+end
+
 function state.switch(stateName)
    passvar = {}
    local matches = {}
    for match in string.gmatch(stateName, "[^;]+") do
-      matches[#matches+1] = match
-   end
-   stateName = matches[1]
-   matches[1] = nil
-   if matches[2] ~= nil then
-      for i, match in ipairs(matches) do
-         passvar[#passvar+1] = match
-      end
+      matches[#matches + 1] = match
    end
 
-   package.loaded[stateName] = false
-   state.name = stateName
+   print("[StateSwitcher] Raw stateName:", stateName)
+   print("[StateSwitcher] Parsed base state:", matches[1])
+   for i, v in ipairs(matches) do
+      print(string.format("[StateSwitcher] Param %d: %s", i, v))
+   end
+
+   stateName = matches[1]
+   table.remove(matches, 1)
+
+   for i = 1, #matches do
+      passvar[i] = matches[i]
+   end
+
+   print("[StateSwitcher] passvar contents:")
+   for i, v in ipairs(passvar) do
+      print(string.format(" passvar[%d] = %s", i, v))
+   end
+
+   forceUnloadModule(stateName)
 
    local modname = stateName:gsub("/", ".")
+   state.name = stateName
    state.current = require(modname)
 
    if type(state.current.load) == "function" then
@@ -47,7 +52,8 @@ function state.switch(stateName)
 end
 
 function state.clear()
-   passvar = nil
+   print("[StateSwitcher] Clearing passvar")
+   passvar = {}
 end
 
 return state
