@@ -3,6 +3,7 @@ local autoscale = require("include.autoscale")
 local SpriteFont = require("include.spritefont")
 local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
+local discord = require("include.discordRPC")
 
 local credits = {}
 
@@ -23,6 +24,13 @@ local selectedButton = 1
 local buttons = MenuButtons.create({
     { text = "Back", callback = function() state.switch("states/mainmenu") end },
 }, bigFont, backButtonScale, vw, vh, backButtonY, 0)
+
+function credits.load()
+    discord.updatePresence({
+        details = "Browsing Menus",
+        state = "Credits"
+    })
+end
 
 function credits.update(dt)
     Starfield.update(dt)

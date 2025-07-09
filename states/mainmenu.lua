@@ -5,6 +5,7 @@ local SpriteFont = require("include.spritefont")
 local MenuButtons = require("include.ui.menubuttons")
 local musicmanager = require("include.musicmanager")
 local discord = require("include.discordRPC")
+local splashtext = require("include.ui.splashtext")
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 local mainmenu = {}
@@ -33,18 +34,23 @@ MenuButtons.updateScroll(buttons, selectedButton, vh)
 local selectSound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
 
 function mainmenu.load()
+    splashtext.init()
+
     if musicmanager.getCurrent() ~= "intro" then
         musicmanager.play("intro", true)
     end
 
     discord.updatePresence({
         details = "Browsing Menus",
-        state = "Main Menu"
+        state = "Main Menu",
+        largeImageKey = "logo",
+        largeImageText = "Cosmic Cities"
     })
 end
 
 function mainmenu.update(dt)
     Starfield.update(dt)
+    splashtext.update(dt)
 end
 
 function mainmenu.draw()
@@ -57,6 +63,10 @@ function mainmenu.draw()
     love.graphics.draw(logo, vw * 0.1, logoY, 0, logoScale, logoScale)
 
     MenuButtons.draw(buttons, selectedButton, bigFont, buttonFontScale, {1, 1, 0}, {1, 1, 1})
+
+    local splashX = vw * 0.1 + (logo:getWidth() * logoScale) * 0.85
+    local splashY = logoY + logo:getHeight() * logoScale
+    splashtext.drawAt(splashX, splashY, -math.pi / 6)
 end
 
 function mainmenu.keypressed(key, scancode, isrepeat)

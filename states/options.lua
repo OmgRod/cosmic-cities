@@ -5,6 +5,7 @@ local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
 local GameSaveManager = require("include.gamesave")
 local Monthlies = require("include.ui.monthlies")
+local discord = require("include.discordRPC")
 
 local options = {}
 
@@ -32,6 +33,13 @@ function options.loadSave(filename)
 end
 
 options.loadSave()
+
+function options.load()
+    discord.updatePresence({
+        details = "Browsing Menus",
+        state = "Options"
+    })
+end
 
 local function createButtons()
     return MenuButtons.create({

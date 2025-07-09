@@ -12,7 +12,7 @@ function love.conf(t)
   t.audio.mixwithsystem = true        -- Keep background music playing when opening LOVE (boolean, iOS and Android only)
   t.window.icon = "icons/icon64.png"
   t.window.borderless = false         -- Remove all border visuals from the window (boolean)
-  t.window.resizable = true          -- Let the window be user-resizable (boolean)
+  t.window.resizable = false          -- Let the window be user-resizable (boolean)
   t.window.fullscreen = false         -- Enable fullscreen (boolean)
   t.window.fullscreentype = "desktop" -- Choose between "desktop" fullscreen or "exclusive" fullscreen mode (string)
   t.window.vsync = 1                  -- Vertical sync mode (number)

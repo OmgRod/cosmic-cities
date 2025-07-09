@@ -23,8 +23,6 @@ local quitting = false
 
 local vw, vh = autoscale.getVirtualSize()
 
-local save
-
 local notificationSprite = nil
 local notificationX = vw
 local notificationY = -100
@@ -78,7 +76,7 @@ function love.load()
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
 
-    discord.initialize("1392251941349757110", true, nil)
+    discord.initialize("1392251941349757110", true, tostring(steam.steam.user.getSteamID()))
 
     save = GameSaveManager.load("options.ini")
     musicmanager.load("intro", "assets/sounds/music.intro.wav", "stream")
@@ -88,6 +86,7 @@ end
 
 function love.update(dt)
     flux.update(dt)
+    discord.runCallbacks()
     deltatime = dt
 
     if escapeHeld then

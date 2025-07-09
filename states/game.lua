@@ -4,6 +4,7 @@ local SpriteFont = require("include.spritefont")
 local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
 local camera = require("include.hump.camera")
+local discord = require("include.discordRPC")
 
 local keybinds = require("states.optionsmenu.keybinds")
 
@@ -35,6 +36,11 @@ function game.load()
     autoscale.resize(w, h)
 
     cam = camera(player.x, player.y)
+
+    discord.updatePresence({
+        details = "Playing",
+        state = "Part 1"
+    })
 
     updateKeybindCache()
 end
