@@ -4,11 +4,9 @@ local SpriteFont = require("include.spritefont")
 local flux = require("include.flux")
 local GameSaveManager = require("include.gamesave")
 local musicmanager = require("include.musicmanager")
+local discord = require("include.discordRPC")
 local ffi = require("ffi")
 local steam = require("include.steamwrapper")
-local discord = require("include.discordRPC")
-
-steam.init()
 
 local escapeHoldTime = 0
 local escapeHeld = false
@@ -76,12 +74,12 @@ function love.load()
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
 
-    discord.initialize("1392251941349757110", true, tostring(steam.steam.user.getSteamID()))
+    steam.init()
 
     save = GameSaveManager.load("options.ini")
     musicmanager.load("intro", "assets/sounds/music.intro.wav", "stream")
 
-    state.switch("states/mainmenu")
+    state.switch("states/loading")
 end
 
 function love.update(dt)

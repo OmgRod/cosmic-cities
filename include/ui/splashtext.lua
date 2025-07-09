@@ -23,15 +23,12 @@ local splashList = {
     "Orbiting logic!",
     "Cosmic creativity!",
     "Zero gravity fun!",
-    "May the source be with you",
     "404: Space not found",
     "Debugging in orbit",
     "Infinite loops in space",
     "Aliens use semicolons?",
     "My code's out of this world",
     "Lost in the star stack",
-    "Syntax error in the Milky Way",
-    "Launching rockets, not exceptions",
     "Function calls from Mars",
     "Black holes swallow bugs",
     "Cosmos meets compiler",
@@ -42,13 +39,8 @@ local splashList = {
     "Spacewalk through variables",
     "Astro-debugging activated",
     "Comet tail recursion",
-    "Pixel dust and star dust",
-    "Galaxies of garbage collection",
     "Code warp speed",
     "Binary stars align",
-    "Satellites can't catch exceptions",
-    "Out of memory... in space",
-    "Launching the debugger shuttle"
 }
 
 love.math.setRandomSeed(os.time())
