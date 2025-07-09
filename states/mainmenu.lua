@@ -4,6 +4,7 @@ local Starfield = require("include.background.starfield")
 local SpriteFont = require("include.spritefont")
 local MenuButtons = require("include.ui.menubuttons")
 local musicmanager = require("include.musicmanager")
+local discord = require("include.discordRPC")
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 local mainmenu = {}
@@ -35,6 +36,11 @@ function mainmenu.load()
     if musicmanager.getCurrent() ~= "intro" then
         musicmanager.play("intro", true)
     end
+
+    discord.updatePresence({
+        details = "Browsing Menus",
+        state = "Main Menu"
+    })
 end
 
 function mainmenu.update(dt)

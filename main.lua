@@ -6,6 +6,7 @@ local GameSaveManager = require("include.gamesave")
 local musicmanager = require("include.musicmanager")
 local ffi = require("ffi")
 local steam = require("include.steamwrapper")
+local discord = require("include.discordRPC")
 
 steam.init()
 
@@ -76,6 +77,8 @@ end
 function love.load()
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
+
+    discord.initialize("1392251941349757110", true, nil)
 
     save = GameSaveManager.load("options.ini")
     musicmanager.load("intro", "assets/sounds/music.intro.wav", "stream")
