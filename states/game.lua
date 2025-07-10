@@ -3,8 +3,11 @@ local autoscale = require("include.autoscale")
 local SpriteFont = require("include.spritefont")
 local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
+local musicmanager = require("include.musicmanager")
 local camera = require("include.hump.camera")
 local discord = require("include.discordRPC")
+local anim8 = require("include.anim8")
+local sti = require("include.sti")
 
 local keybinds = require("states.optionsmenu.keybinds")
 
@@ -13,8 +16,8 @@ local game = {}
 local vw, vh = autoscale.getVirtualSize()
 
 local player = {
-    x = vw / 2,
-    y = vh / 2,
+    x = 790,
+    y = 420,
     speed = 200
 }
 
@@ -34,6 +37,12 @@ function game.load()
     autoscale.load()
     local w, h = love.graphics.getDimensions()
     autoscale.resize(w, h)
+
+    if musicmanager.getCurrent() == "intro" then
+        musicmanager.stop("intro")
+    end
+
+    gameMap = sti("rooms/ship-cryobeds.lua")
 
     cam = camera(player.x, player.y)
 
@@ -57,16 +66,16 @@ function game.update(dt)
     Starfield.update(dt)
 
     if love.keyboard.isDown(cachedKeybinds.walkdown) then
-        player.y = math.min(player.y + player.speed * dt, vh)
+        player.y = player.y + player.speed * dt
     end
     if love.keyboard.isDown(cachedKeybinds.walkup) then
-        player.y = math.max(player.y - player.speed * dt, 0)
+        player.y = player.y - player.speed * dt
     end
     if love.keyboard.isDown(cachedKeybinds.walkleft) then
-        player.x = math.max(player.x - player.speed * dt, 0)
+        player.x = player.x - player.speed * dt
     end
     if love.keyboard.isDown(cachedKeybinds.walkright) then
-        player.x = math.min(player.x + player.speed * dt, vw)
+        player.x = player.x + player.speed * dt
     end
 
     cam:lookAt(player.x, player.y)
@@ -76,9 +85,12 @@ function game.draw()
     autoscale.apply()
 
     cam:attach()
-    Starfield.draw()
+    gameMap:drawLayer(gameMap.layers["Ground"])
+    gameMap:drawLayer(gameMap.layers["Objects-1"])
+    gameMap:drawLayer(gameMap.layers["BackWall"])
     love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", player.x, player.y, 10)
+    gameMap:drawLayer(gameMap.layers["FrontWall"])
     cam:detach()
 
     autoscale.reset()
