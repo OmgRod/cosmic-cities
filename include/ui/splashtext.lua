@@ -1,46 +1,40 @@
 local SpriteFont = require("include.spritefont")
+local autoscale = require("include.autoscale")
 local splashtext = {}
 
 local font = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
+local vw, vh = autoscale.getVirtualSize()
 local splashList = {
     "Hello World!",
-    "Lua is love.",
-    "Powered by LOVE!",
     "Pixel Perfect!",
-    "Scripting Supreme!",
-    "Frame it fast!",
-    "Draw with bytes!",
     "Retro vibes!",
-    "Modular Madness!",
     "Bouncy text!",
-    "Code is poetry!",
-    "Compile and conquer!",
-    "Hello, bugs!",
-    "Debugging mode ON",
-    "Script like a wizard",
-    "Stars in the code!",
     "Galactic bytes!",
     "Orbiting logic!",
     "Cosmic creativity!",
     "Zero gravity fun!",
     "404: Space not found",
-    "Debugging in orbit",
-    "Infinite loops in space",
-    "Aliens use semicolons?",
-    "My code's out of this world",
     "Lost in the star stack",
-    "Function calls from Mars",
     "Black holes swallow bugs",
-    "Cosmos meets compiler",
-    "Interstellar if-else",
-    "Quantum bits and bytes",
-    "Rocket fuel for your code",
-    "Deploying to the moon",
-    "Spacewalk through variables",
-    "Astro-debugging activated",
-    "Comet tail recursion",
-    "Code warp speed",
-    "Binary stars align",
+    "The stars remember",
+    "Don't forget your soul",
+    "* [Redacted]",
+    "The void is listening",
+    "This one's watching you",
+    "You feel like you've seen this before",
+    "Another world, another time",
+    "Somewhere, someone is waiting",
+    "* It's still loading. Or is it?",
+    "You hear distant laughter",
+    "Don't trust the stars",
+    "The sky hums softly",
+    "Everything feels a bit... off",
+    "Your name is missing",
+    "This reality is temporary",
+    "You are not alone",
+    "PRESS [Z] TO BELIEVE",
+    "There's a door somewhere",
+    "The darkness knows your name",
 }
 
 love.math.setRandomSeed(os.time())
@@ -72,10 +66,19 @@ function splashtext.update(dt)
 end
 
 function splashtext.drawAt(x, y, angle)
+    local baseMaxScale = 1
+
+    local fullWidthAtScale1 = font:getWidth(currentSplash, 1)
+    local maxAllowedScale = (vw - margin * 2) / fullWidthAtScale1
+
+    local maxScaleDynamic = math.min(baseMaxScale, maxAllowedScale)
+    local baseScaleDynamic = maxScaleDynamic * 0.75
+
     local t = (timer / interval) * math.pi
-    local scale = baseScale + (maxScale - baseScale) * math.abs(math.sin(t))
-    local width = font:getWidth(currentSplash, scale)
-    local height = font.lineHeight * scale
+    local animScale = baseScaleDynamic + (maxScaleDynamic - baseScaleDynamic) * math.abs(math.sin(t))
+
+    local width = font:getWidth(currentSplash, animScale)
+    local height = font.lineHeight * animScale
 
     love.graphics.push()
     love.graphics.translate(x + margin, y + margin)
@@ -86,13 +89,13 @@ function splashtext.drawAt(x, y, angle)
     for dx = -outlineSize, outlineSize do
         for dy = -outlineSize, outlineSize do
             if dx ~= 0 or dy ~= 0 then
-                font:draw(currentSplash, dx, dy, scale)
+                font:draw(currentSplash, dx, dy, animScale)
             end
         end
     end
 
     love.graphics.setColor(yellow)
-    font:draw(currentSplash, 0, 0, scale)
+    font:draw(currentSplash, 0, 0, animScale)
 
     love.graphics.pop()
 end
