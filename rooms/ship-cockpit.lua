@@ -9,10 +9,69 @@ return {
   height = 20,
   tilewidth = 64,
   tileheight = 64,
-  nextlayerid = 2,
-  nextobjectid = 1,
+  nextlayerid = 5,
+  nextobjectid = 7,
   properties = {},
-  tilesets = {},
+  tilesets = {
+    {
+      name = "CC_shipSheet_001",
+      firstgid = 1,
+      class = "",
+      tilewidth = 64,
+      tileheight = 64,
+      spacing = 0,
+      margin = 0,
+      columns = 8,
+      image = "../assets/sprites/CC_shipSheet_001.png",
+      imagewidth = 512,
+      imageheight = 512,
+      objectalignment = "unspecified",
+      tilerendersize = "tile",
+      fillmode = "stretch",
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      grid = {
+        orientation = "orthogonal",
+        width = 64,
+        height = 64
+      },
+      properties = {},
+      wangsets = {},
+      tilecount = 64,
+      tiles = {}
+    },
+    {
+      name = "CC_shipSheet_001",
+      firstgid = 65,
+      class = "",
+      tilewidth = 64,
+      tileheight = 64,
+      spacing = 0,
+      margin = 0,
+      columns = 8,
+      image = "../assets/sprites/CC_shipSheet_001.png",
+      imagewidth = 512,
+      imageheight = 512,
+      objectalignment = "unspecified",
+      tilerendersize = "tile",
+      fillmode = "stretch",
+      tileoffset = {
+        x = 0,
+        y = 0
+      },
+      grid = {
+        orientation = "orthogonal",
+        width = 64,
+        height = 64
+      },
+      properties = {},
+      wangsets = {},
+      tilecount = 64,
+      tiles = {}
+    }
+  },
   layers = {
     {
       type = "tilelayer",
@@ -20,8 +79,8 @@ return {
       y = 0,
       width = 30,
       height = 20,
-      id = 1,
-      name = "Tile Layer 1",
+      id = 2,
+      name = "Ground",
       class = "",
       visible = true,
       opacity = 1,
@@ -31,7 +90,184 @@ return {
       parallaxy = 1,
       properties = {},
       encoding = "lua",
-      chunks = {}
+      chunks = {
+        {
+          x = 0, y = 0, width = 16, height = 16,
+          data = {
+            0, 0, 0, 0, 0, 0, 0, 73, 73, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 73, 73, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 73, 73, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 73, 73, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 73, 73, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 0, 0, 0,
+            0, 0, 0, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 0, 0, 0,
+            0, 0, 0, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 0, 0, 0,
+            0, 0, 0, 73, 73, 73, 73, 73, 73, 73, 73, 73, 73, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+          }
+        }
+      }
+    },
+    {
+      type = "tilelayer",
+      x = 0,
+      y = 0,
+      width = 30,
+      height = 20,
+      id = 1,
+      name = "Walls",
+      class = "",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      encoding = "lua",
+      chunks = {
+        {
+          x = 0, y = 0, width = 16, height = 16,
+          data = {
+            2, 66, 66, 66, 66, 66, 66, 0, 0, 66, 66, 66, 66, 66, 66, 66,
+            66, 66, 66, 66, 66, 66, 66, 0, 0, 66, 66, 66, 66, 66, 66, 66,
+            66, 66, 66, 66, 66, 66, 66, 0, 0, 66, 66, 66, 66, 66, 66, 66,
+            66, 66, 66, 66, 66, 66, 66, 0, 0, 66, 66, 66, 66, 66, 66, 66,
+            66, 66, 66, 66, 66, 66, 66, 0, 0, 66, 66, 66, 66, 66, 66, 66,
+            66, 66, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 66, 66,
+            66, 66, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 66, 66,
+            66, 66, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 66, 66,
+            66, 66, 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 66, 66,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+          }
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "topdown",
+      id = 3,
+      name = "Hitboxes",
+      class = "",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      objects = {
+        {
+          id = 1,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 192,
+          y = 512,
+          width = 640,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 2,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 832,
+          y = 0,
+          width = 192,
+          height = 576,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 3,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 0,
+          y = 0,
+          width = 192,
+          height = 576,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 4,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 192,
+          y = 0,
+          width = 256,
+          height = 320,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 5,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 576,
+          y = 0,
+          width = 256,
+          height = 320,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        }
+      }
+    },
+    {
+      type = "objectgroup",
+      draworder = "topdown",
+      id = 4,
+      name = "RoomSwap",
+      class = "",
+      visible = true,
+      opacity = 1,
+      offsetx = 0,
+      offsety = 0,
+      parallaxx = 1,
+      parallaxy = 1,
+      properties = {},
+      objects = {
+        {
+          id = 6,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 448,
+          y = 0,
+          width = 128,
+          height = 64,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["RoomFilename"] = "rooms/ship-main.lua",
+            ["targetX"] = 1664,
+            ["targetY"] = 2976
+          }
+        }
+      }
     }
   }
 }

@@ -47,7 +47,7 @@ function game.load()
     world:addCollisionClass("RoomSwap")
     world:addCollisionClass("Player", {ignores = {'RoomSwap'}})
 
-    player.collider = world:newBSGRectangleCollider(508, -352, 48, 48, 14)
+    player.collider = world:newBSGRectangleCollider(2528, 1760, 48, 48, 14)
     player.collider:setFixedRotation(true)
     player.collider:setCollisionClass("Player")
     player.collider:setObject(player)
@@ -57,7 +57,7 @@ function game.load()
         musicmanager.stop("intro")
     end
 
-    game.loadMap("rooms/ship-main.lua", 508, -352)
+    game.loadMap("rooms/ship-main.lua", 2528, 1760)
 
     cam = camera(player.collider:getX(), player.collider:getY())
 
@@ -145,6 +145,27 @@ function game.update(dt)
 
     local px, py = player.collider:getPosition()
     cam:lookAt(px, py)
+    
+    -- Top
+    if cam.x < vw/2 then
+        cam.x = vw/2
+    end
+    -- Left
+    if cam.y < vh/2 then
+        cam.y = vh/2
+    end
+
+    local mapW = gameMap.width * gameMap.tilewidth
+    local mapH = gameMap.height * gameMap.tileheight
+
+    -- Right
+    if cam.x > (mapW - vw/2) then
+        cam.x = (mapW - vw/2)
+    end
+    -- Bottom
+    if cam.y > (mapH - vh/2) then
+        cam.y = (mapH - vh/2)
+    end
 end
 
 function game.draw()

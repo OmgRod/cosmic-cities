@@ -18,7 +18,7 @@ local splashList = {
     "Black holes swallow bugs",
     "The stars remember",
     "Don't forget your soul",
-    "* [Redacted]",
+    "* [[Hyperlink blocked]]",
     "The void is listening",
     "This one's watching you",
     "You feel like you've seen this before",
