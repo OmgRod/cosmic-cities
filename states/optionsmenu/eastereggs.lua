@@ -31,7 +31,7 @@ local function createButtons()
         { 
             text = "Options Icons: " .. ((save:get("monthlies", "EasterEggs") and "On") or "Off"), 
             callback = function()
-                save:set("monthlies", not save:get("monthlies", "EasterEggs"), "EasterEggs")
+                save:setAndSave("monthlies", not save:get("monthlies", "EasterEggs"), "EasterEggs")
                 buttons = createButtons()
                 selectedButton = 1
             end

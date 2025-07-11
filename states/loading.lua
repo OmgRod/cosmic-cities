@@ -27,12 +27,11 @@ local loading = {
 flux.to(loading, 1, { fade = 1 }):ease("quadout")
 
 local stages = {
-    {
-        name = "Example loading state",
-        func = function()
-            print("Hello, world!")
-        end
-    }
+    -- {
+    --     name = "Example loading state",
+    --     func = function()
+    --     end
+    -- }
 }
 
 function loading.update(dt)

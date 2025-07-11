@@ -6,8 +6,8 @@ local starCount = 100
 local starSpeed = 2.5
 
 local stars = {}
-local bgColorA = {0.02, 0.05, 0.02}
-local bgColorB = {0.04, 0.08, 0.04}
+local bgColorA = {0.0, 0.01, 0.015}
+local bgColorB = {0.015, 0.02, 0.03}
 local bgColor = {0, 0, 0}
 local bgColorTime = 0
 local bgColorDuration = 10
@@ -45,19 +45,19 @@ function Starfield.update(dt)
 end
 
 function Starfield.draw()
-    love.graphics.setColor(1, 1, 1, 1)
-    for _, star in ipairs(stars) do
-        love.graphics.rectangle("fill", star.x, star.y, star.size, star.size)
-    end
-
     local t = bgColorTime / (bgColorDuration / 2)
     if t > 1 then t = 2 - t end
     for i = 1, 3 do
         bgColor[i] = bgColorA[i] + (bgColorB[i] - bgColorA[i]) * t
     end
 
-    love.graphics.setColor(bgColor[1], bgColor[2], bgColor[3], 0.3)
+    love.graphics.setColor(bgColor[1], bgColor[2], bgColor[3], 1)
     love.graphics.rectangle("fill", 0, 0, vw, vh)
+
+    love.graphics.setColor(1, 1, 1, 1)
+    for _, star in ipairs(stars) do
+        love.graphics.rectangle("fill", star.x, star.y, star.size, star.size)
+    end
 end
 
 return Starfield

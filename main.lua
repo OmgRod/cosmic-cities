@@ -71,6 +71,7 @@ function love.joystickadded(joystick)
 end
 
 function love.load()
+
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
 

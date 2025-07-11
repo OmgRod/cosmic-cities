@@ -24,9 +24,18 @@ local cam
 local cachedKeybinds = {}
 local world
 local player = {}
+local gameMap
+local mapColliders = {}
 
 local function updateKeybindCache()
     cachedKeybinds = keybinds.getCurrentKeybinds()
+end
+
+local function clearMapColliders()
+    for _, collider in ipairs(mapColliders) do
+        collider:destroy()
+    end
+    mapColliders = {}
 end
 
 function game.load()
@@ -35,26 +44,20 @@ function game.load()
     autoscale.resize(w, h)
 
     world = wf.newWorld(0, 0, true)
+    world:addCollisionClass("RoomSwap")
+    world:addCollisionClass("Player", {ignores = {'RoomSwap'}})
 
-    player.collider = world:newBSGRectangleCollider(1312, 416, 48, 48, 14)
+    player.collider = world:newBSGRectangleCollider(508, -352, 48, 48, 14)
     player.collider:setFixedRotation(true)
+    player.collider:setCollisionClass("Player")
+    player.collider:setObject(player)
     player.speed = 200
 
     if musicmanager.getCurrent() == "intro" then
         musicmanager.stop("intro")
     end
 
-    gameMap = sti("rooms/ship-cryobeds.lua")
-
-    local hitboxLayer = gameMap.layers["Hitboxes"]
-    if hitboxLayer and hitboxLayer.objects then
-        for _, obj in ipairs(hitboxLayer.objects) do
-            if obj.shape == "rectangle" then
-                local collider = world:newRectangleCollider(obj.x, obj.y, obj.width, obj.height)
-                collider:setType("static")
-            end
-        end
-    end
+    game.loadMap("rooms/ship-main.lua", 508, -352)
 
     cam = camera(player.collider:getX(), player.collider:getY())
 
@@ -64,6 +67,40 @@ function game.load()
     })
 
     updateKeybindCache()
+end
+
+function game.loadMap(mapPath, px, py)
+    clearMapColliders()
+
+    gameMap = sti(mapPath)
+
+    local hitboxLayer = gameMap.layers["Hitboxes"]
+    if hitboxLayer and hitboxLayer.objects then
+        for _, obj in ipairs(hitboxLayer.objects) do
+            if obj.shape == "rectangle" then
+                local collider = world:newRectangleCollider(obj.x, obj.y, obj.width, obj.height)
+                collider:setType("static")
+                table.insert(mapColliders, collider)
+            end
+        end
+    end
+
+    local roomSwapLayer = gameMap.layers["RoomSwap"]
+    if roomSwapLayer and roomSwapLayer.objects then
+        for _, obj in ipairs(roomSwapLayer.objects) do
+            if obj.shape == "rectangle" then
+                local collider = world:newRectangleCollider(obj.x, obj.y, obj.width, obj.height)
+                collider:setCollisionClass("RoomSwap")
+                collider:setObject(obj)
+                collider:setType("static")
+                table.insert(mapColliders, collider)
+            end
+        end
+    end
+
+    if px and py then
+        player.collider:setPosition(px, py)
+    end
 end
 
 function game.resize(w, h)
@@ -92,6 +129,18 @@ function game.update(dt)
         player.collider:setLinearVelocity(0, 0)
     end
 
+    if player.collider:enter('RoomSwap') then
+        local collision_data = player.collider:getEnterCollisionData('RoomSwap')
+        local other = collision_data.collider
+        local userData = other:getObject()
+        if userData and userData.properties and userData.properties.RoomFilename then
+            local targetMap = userData.properties.RoomFilename
+            local targetX = userData.properties.targetX or player.collider:getX()
+            local targetY = userData.properties.targetY or player.collider:getY()
+            game.loadMap(targetMap, targetX, targetY)
+        end
+    end
+
     world:update(dt)
 
     local px, py = player.collider:getPosition()
@@ -100,6 +149,7 @@ end
 
 function game.draw()
     autoscale.apply()
+    Starfield.draw()
     cam:attach()
 
     if gameMap.layers["Ground"] then

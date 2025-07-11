@@ -27,17 +27,17 @@ local buttons = MenuButtons.create({
     { text = "Start", callback = function() state.switch("states/selectsave") end },
     { text = "Options", callback = function() state.switch("states/options") end },
     { text = "Credits", callback = function() state.switch("states/credits") end },
-    { 
-        text = "Test", 
-        callback = function()
-            if not mainmenu.textbox then
-                mainmenu.textbox = TextboxModule.Textbox.new(0, 0,
-                "Hello <cb>blue</c> and <c#ff8800>orange</c>! This is the <cs>Test</c> textbox. <i50>Instant text here.</i> <s3>Shaking!</s> Wait <d30>30 centiseconds.",
-                bigFont, 30)
-                mainmenu.textbox:setPosition((vw - mainmenu.textbox.width)/2, (vh - mainmenu.textbox.height)/2)
-            end
-        end 
-    },
+    -- { 
+    --     text = "Test", 
+    --     callback = function()
+    --         if not mainmenu.textbox then
+    --             mainmenu.textbox = TextboxModule.Textbox.new(0, 0,
+    --             "Hello <cb>blue</c> and <c#ff8800>orange</c>! This is the <cs>Test</c> textbox. <i50>Instant text here.</i> <s3>Shaking!</s> Wait <d30>30 centiseconds.",
+    --             bigFont, 30)
+    --             mainmenu.textbox:setPosition((vw - mainmenu.textbox.width)/2, (vh - mainmenu.textbox.height)/2)
+    --         end
+    --     end 
+    -- },
     { text = "Exit", callback = function() love.event.quit() end },
 }, bigFont, buttonFontScale, vw, vh, logoHeight, buttonSpacing)
 
