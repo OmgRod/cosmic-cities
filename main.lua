@@ -71,7 +71,7 @@ function love.joystickadded(joystick)
 end
 
 function love.load()
-
+    love.setDeprecationOutput(false)
     autoscale.load()
     autoscale.resize(love.graphics.getDimensions())
 
