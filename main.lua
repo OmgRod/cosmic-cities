@@ -76,6 +76,7 @@ function love.load()
     autoscale.resize(love.graphics.getDimensions())
 
     steam.init()
+    discord.initialize("1392251941349757110", true, nil)
 
     save = GameSaveManager.load("options.ini")
     musicmanager.load("intro", "assets/sounds/music.intro.wav", "stream")

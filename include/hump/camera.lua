@@ -28,6 +28,7 @@ local _PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
 local cos, sin = math.cos, math.sin
 
 local autoscale = require('include.autoscale')
+local flux = require('include.flux')
 
 local camera = {}
 camera.__index = camera
@@ -98,6 +99,24 @@ end
 
 function camera:zoomTo(zoom)
 	self.scale = zoom
+	return self
+end
+
+function camera:zoomTween(mul, time)
+	if time and time > 0 then
+		flux.to(self, time, { scale = self.scale * mul })
+	else
+		self.scale = self.scale * mul
+	end
+	return self
+end
+
+function camera:zoomToTween(zoom, time)
+	if time and time > 0 then
+		flux.to(self, time, { scale = zoom })
+	else
+		self.scale = zoom
+	end
 	return self
 end
 
