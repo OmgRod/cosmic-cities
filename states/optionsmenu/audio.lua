@@ -5,8 +5,9 @@ local Starfield = require("include.background.starfield")
 local MenuButtons = require("include.ui.menubuttons")
 local GameSaveManager = require("include.gamesave")
 local Monthlies = require("include.ui.monthlies")
+local musicmanager = require("include.musicmanager")
 
-local eastereggs = {}
+local audio = {}
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 
@@ -29,9 +30,16 @@ local buttons
 local function createButtons()
     return MenuButtons.create({
         { 
-            text = "Options Icons: " .. ((save:get("monthlies", "EasterEggs") and "On") or "Off"), 
+            text = "Old Menu Theme: " .. ((save:get("oldmenutheme", "Audio") and "On") or "Off"), 
             callback = function()
-                save:setAndSave("monthlies", not save:get("monthlies", "EasterEggs"), "EasterEggs")
+                save:setAndSave("oldmenutheme", not save:get("oldmenutheme", "Audio"), "Audio")
+                if save:get("oldmenutheme", "Audio") then
+                    musicmanager.stop(musicmanager.getCurrent())
+                    musicmanager.play("music.intro.old", true)
+                else
+                    musicmanager.stop(musicmanager.getCurrent())
+                    musicmanager.play("music.intro", true)
+                end
                 buttons = createButtons()
                 selectedButton = 1
             end
@@ -42,11 +50,11 @@ end
 
 buttons = createButtons()
 
-function eastereggs.update(dt)
+function audio.update(dt)
     Starfield.update(dt)
 end
 
-function eastereggs.draw()
+function audio.draw()
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.clear()
 
@@ -64,7 +72,7 @@ function eastereggs.draw()
     Monthlies.draw()
 end
 
-function eastereggs.keypressed(key)
+function audio.keypressed(key)
     local sound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "static")
     if key == "down" then
         selectedButton = selectedButton % #buttons + 1
@@ -78,9 +86,9 @@ function eastereggs.keypressed(key)
     end
 end
 
-function eastereggs.enter()
+function audio.enter()
     selectedButton = 1
     buttons = createButtons()
 end
 
-return eastereggs
+return audio

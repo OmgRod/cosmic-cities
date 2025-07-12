@@ -6,8 +6,8 @@ local MenuButtons = require("include.ui.menubuttons")
 local musicmanager = require("include.musicmanager")
 local discord = require("include.discordRPC")
 local splashtext = require("include.ui.splashtext")
-
 local TextboxModule = require("include.ui.textbox")
+local gamesave = require("include.gamesave")
 
 local bigFont = SpriteFont.new("assets/fonts/pixel_operator.fnt", "assets/fonts/")
 local mainmenu = {}
@@ -48,8 +48,16 @@ local selectSound = love.audio.newSource("assets/sounds/sfx.select.1.wav", "stat
 function mainmenu.load()
     splashtext.init()
 
-    if musicmanager.getCurrent() ~= "intro" then
-        musicmanager.play("intro", true)
+    if gamesave.load("options.ini"):get("oldmenutheme", "Audio") then
+        if musicmanager.getCurrent() ~= "music.intro.old" then
+            musicmanager.stop(musicmanager.getCurrent())
+            musicmanager.play("music.intro.old", true)
+        end
+    else
+        if musicmanager.getCurrent() ~= "music.intro" then
+            musicmanager.stop(musicmanager.getCurrent())
+            musicmanager.play("music.intro", true)
+        end
     end
 
     discord.updatePresence({
