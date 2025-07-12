@@ -276,6 +276,9 @@ function game.draw()
     if gameMap.layers["Walls"] then
         gameMap:drawLayer(gameMap.layers["Walls"])
     end
+    if gameMap.layers["Walls-2"] then
+        gameMap:drawLayer(gameMap.layers["Walls-2"])
+    end
 
     love.graphics.setColor(1, 1, 1)
     local px, py = player.collider:getPosition()

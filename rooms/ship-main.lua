@@ -10,7 +10,7 @@ return {
   tilewidth = 64,
   tileheight = 64,
   nextlayerid = 13,
-  nextobjectid = 97,
+  nextobjectid = 98,
   properties = {},
   tilesets = {
     {
@@ -1205,6 +1205,23 @@ return {
             ["RoomFilename"] = "rooms/ship-cockpit.lua",
             ["targetX"] = 512,
             ["targetY"] = 100
+          }
+        },
+        {
+          id = 97,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 2240,
+          y = 1280,
+          width = 64,
+          height = 128,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["RoomFilename"] = "rooms/ship-stairs.lua",
+            ["targetX"] = 416,
+            ["targetY"] = 256
           }
         }
       }

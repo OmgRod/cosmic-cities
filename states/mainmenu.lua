@@ -87,11 +87,15 @@ function mainmenu.draw()
     if mainmenu.textbox then
         mainmenu.textbox:draw()
     end
+
+    local copyrightFont = love.graphics.newFont("assets/fonts/pixeloperator.ttf", 16)
+    love.graphics.setFont(copyrightFont)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print("© OmgRod 2025 - All Rights Reserved", 10, vh - 20)
 end
 
 function mainmenu.keypressed(key, scancode, isrepeat)
     if mainmenu.textbox then
-        -- Close textbox on Escape or Enter
         if key == "escape" or key == "return" or key == "z" then
             mainmenu.textbox = nil
             return
