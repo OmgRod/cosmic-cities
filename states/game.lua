@@ -126,8 +126,8 @@ function game.load(savename)
     player.collider:setObject(player)
     player.speed = 200
 
-    if musicmanager.getCurrent() == "intro" then
-        musicmanager.stop("intro")
+    if musicmanager.getCurrent() == "music.intro" or musicmanager.getCurrent() == "music.intro.old" then
+        musicmanager.stop(musicmanager.getCurrent())
     end
 
     game.loadMap(true, savedata.currentRoom or currentRoom, savedata.playerX or 2528, savedata.playerY or 1760)
