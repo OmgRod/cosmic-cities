@@ -69,6 +69,7 @@ If you'd like to add a feature or fix a bug, feel free to fork and open a PR.
 ## License
 
 **All rights reserved.**  
-You may not copy, distribute, or modify this project without explicit permission from the author.
+If you'd like to contribute, check out [`ROADMAP.md`](ROADMAP.md) to see what's planned or browse [open issues](https://github.com/OmgRod/cosmic-cities/issues).  
+Feel free to fork the repository and submit your improvements or bug fixes.
 
 Thanks for checking out Cosmic Cities!
