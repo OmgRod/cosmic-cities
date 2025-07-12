@@ -39,6 +39,9 @@ local hasSavedInPause = false
 
 local currentRoom = "rooms/ship-main.lua"
 
+local autosaveTimer = 0
+local autosaveInterval = 10
+
 function game.saveGame()
     save:set("playerX", player.collider:getX(), "Position")
     save:set("playerY", player.collider:getY(), "Position")
@@ -74,7 +77,6 @@ local function initPauseButtons()
             text = "Exit",
             callback = function()
                 if not hasSavedInPause then
-                    -- show popup logic, placeholder for now:
                     print("Warning: You haven't saved the game.")
                 else
                     state.switch("states/mainmenu")
@@ -121,7 +123,7 @@ function game.load(savename)
         musicmanager.stop("intro")
     end
 
-    game.loadMap(savedata.currentRoom or currentRoom, savedata.playerX or 2528, savedata.playerY or 1760)
+    game.loadMap(true, savedata.currentRoom or currentRoom, savedata.playerX or 2528, savedata.playerY or 1760)
 
     cam = camera(player.collider:getX(), player.collider:getY())
 
@@ -133,7 +135,7 @@ function game.load(savename)
     updateKeybindCache()
 end
 
-function game.loadMap(mapPath, px, py)
+function game.loadMap(isFirstLoad, mapPath, px, py)
     clearMapColliders()
 
     gameMap = sti(mapPath)
@@ -166,6 +168,12 @@ function game.loadMap(mapPath, px, py)
 
     if px and py then
         player.collider:setPosition(px, py)
+    end
+
+    local autosaveEnabled = GameSaveManager.load("options.ini"):get("autosave", "Miscellaneous")
+    if not isFirstLoad and (autosaveEnabled == true or autosaveEnabled == "true") then
+        game.saveGame()
+        print("game autosaved by room switch")
     end
 end
 
@@ -218,8 +226,16 @@ function game.update(dt)
             local targetMap = userData.properties.RoomFilename
             local targetX = userData.properties.targetX or player.collider:getX()
             local targetY = userData.properties.targetY or player.collider:getY()
-            game.loadMap(targetMap, targetX, targetY)
+            game.loadMap(false, targetMap, targetX, targetY)
         end
+    end
+
+    local autosaveEnabled = GameSaveManager.load("options.ini"):get("autosave", "Miscellaneous")
+    autosaveTimer = autosaveTimer + dt
+    if autosaveTimer >= autosaveInterval and (autosaveEnabled == true or autosaveEnabled == "true") then
+        game.saveGame()
+        autosaveTimer = 0
+        print("game autosaved by timer")
     end
 
     world:update(dt)
