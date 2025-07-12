@@ -37,9 +37,12 @@ local pausedSpacing = 15
 local pausedLogoHeight = vh * 0.2
 local hasSavedInPause = false
 
+local currentRoom = "rooms/ship-main.lua"
+
 function game.saveGame()
     save:set("playerX", player.collider:getX(), "Position")
     save:set("playerY", player.collider:getY(), "Position")
+    save:set("currentRoom", currentRoom, "Position")
     save:save()
 end
 
@@ -47,6 +50,7 @@ function game.loadGame()
     local savedata = {
         playerX = save:get("playerX", "Position"),
         playerY = save:get("playerY", "Position"),
+        currentRoom = save:get("currentRoom", "Position"),
     }
     return savedata
 end
@@ -117,7 +121,7 @@ function game.load(savename)
         musicmanager.stop("intro")
     end
 
-    game.loadMap("rooms/ship-main.lua", savedata.playerX or 2528, savedata.playerY or 1760)
+    game.loadMap(savedata.currentRoom or currentRoom, savedata.playerX or 2528, savedata.playerY or 1760)
 
     cam = camera(player.collider:getX(), player.collider:getY())
 
@@ -133,6 +137,8 @@ function game.loadMap(mapPath, px, py)
     clearMapColliders()
 
     gameMap = sti(mapPath)
+
+    currentRoom = mapPath
 
     local hitboxLayer = gameMap.layers["Hitboxes"]
     if hitboxLayer and hitboxLayer.objects then
