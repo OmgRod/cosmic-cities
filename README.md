@@ -62,7 +62,7 @@ If you'd like to add a feature or fix a bug, feel free to fork and open a PR.
 
 - Game code by [OmgRod](https://github.com/OmgRod) & [contributors](https://github.com/OmgRod/cosmic-cities/graphs/contributors)
 - Logo & art by [OmgRod](https://github.com/OmgRod)
-- Music by PumpkinSmarty
+- Music by [PumpkinSmarty](https://www.bandlab.com/pumpkinsmarty)
 
 ---
 
