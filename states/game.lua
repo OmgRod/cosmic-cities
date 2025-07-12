@@ -178,9 +178,16 @@ function game.refreshKeybinds()
 end
 
 function game.update(dt)
-    if love.keyboard.isDown(cachedKeybinds.pause) and not isPaused then
-        isPaused = true
-        initPauseButtons()
+    if love.keyboard.isDown(cachedKeybinds.pause) then
+        if not game._pausePressed then
+            isPaused = not isPaused
+            if isPaused then
+                initPauseButtons()
+            end
+            game._pausePressed = true
+        end
+    else
+        game._pausePressed = false
     end
 
     if isPaused then
