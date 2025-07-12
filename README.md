@@ -68,6 +68,7 @@ If you'd like to add a feature or fix a bug, feel free to fork and open a PR.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+**All rights reserved.**  
+You may not copy, distribute, or modify this project without explicit permission from the author.
 
 Thanks for checking out Cosmic Cities!
