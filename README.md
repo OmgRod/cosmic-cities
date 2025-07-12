@@ -2,7 +2,6 @@
   <img src="assets/sprites/CC_titleLogo_001.png" alt="Cosmic Cities" width="400"/>
 </p>
 
-<h1 align="center">Cosmic Cities</h1>
 <p align="center">A 2D sci-fi exploration game built with LÖVE2D.</p>
 
 ---
