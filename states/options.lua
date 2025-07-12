@@ -26,8 +26,6 @@ local buttonSpacing = 5
 local totalButtonsHeight = (buttonHeight * buttonCount) + (buttonSpacing * (buttonCount - 1))
 local startY = (vh / 2) - (totalButtonsHeight / 2) - 50
 
-local save
-
 function options.loadSave(filename)
     save = GameSaveManager.load(filename or "options.ini")
 end
@@ -50,8 +48,14 @@ local function createButtons()
         {
             text = "Show FPS: " .. ((save:get("fps", "Miscellaneous") and "On") or "Off"), 
             callback = function()
-                save:set("fps", not save:get("fps", "Miscellaneous"), "Miscellaneous")
-                save:save("options.ini")
+                save:setAndSave("fps", not save:get("fps", "Miscellaneous"), "Miscellaneous")
+                buttons = createButtons()
+            end
+        },
+        {
+            text = "Autosave: " .. ((save:get("autosave", "Miscellaneous") and "On") or "Off"), 
+            callback = function()
+                save:setAndSave("autosave", not save:get("autosave", "Miscellaneous"), "Miscellaneous")
                 buttons = createButtons()
             end
         },

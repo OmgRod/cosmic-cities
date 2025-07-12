@@ -9,8 +9,10 @@ local discord = require("include.discordRPC")
 local anim8 = require("include.anim8")
 local sti = require("include.sti")
 local wf = require("include.windfield")
-
+local GameSaveManager = require("include.gamesave")
 local keybinds = require("states.optionsmenu.keybinds")
+
+local save
 
 local game = {}
 
@@ -27,6 +29,60 @@ local player = {}
 local gameMap
 local mapColliders = {}
 
+local isPaused = false
+local pauseButtons = {}
+local selectedPauseButton = 1
+local pausedFontScale = 1.5
+local pausedSpacing = 15
+local pausedLogoHeight = vh * 0.2
+local hasSavedInPause = false
+
+function game.saveGame()
+    save:set("playerX", player.collider:getX(), "Position")
+    save:set("playerY", player.collider:getY(), "Position")
+    save:save()
+end
+
+function game.loadGame()
+    local savedata = {
+        playerX = save:get("playerX", "Position"),
+        playerY = save:get("playerY", "Position"),
+    }
+    return savedata
+end
+
+local function initPauseButtons()
+    pauseButtons = MenuButtons.create({
+        {
+            text = "Continue",
+            callback = function()
+                isPaused = false
+            end
+        },
+        {
+            text = "Save Game",
+            callback = function()
+                game.saveGame()
+                hasSavedInPause = true
+            end
+        },
+        {
+            text = "Exit",
+            callback = function()
+                if not hasSavedInPause then
+                    -- show popup logic, placeholder for now:
+                    print("Warning: You haven't saved the game.")
+                else
+                    state.switch("states/mainmenu")
+                end
+            end
+        }
+    }, bigFont, pausedFontScale, vw, vh, pausedLogoHeight, pausedSpacing)
+    selectedPauseButton = 1
+    hasSavedInPause = false
+    MenuButtons.updateScroll(pauseButtons, selectedPauseButton)
+end
+
 local function updateKeybindCache()
     cachedKeybinds = keybinds.getCurrentKeybinds()
 end
@@ -38,16 +94,20 @@ local function clearMapColliders()
     mapColliders = {}
 end
 
-function game.load()
+function game.load(savename)
     autoscale.load()
     local w, h = love.graphics.getDimensions()
     autoscale.resize(w, h)
+
+    save = GameSaveManager.load(savename)
 
     world = wf.newWorld(0, 0, true)
     world:addCollisionClass("RoomSwap")
     world:addCollisionClass("Player", {ignores = {'RoomSwap'}})
 
-    player.collider = world:newBSGRectangleCollider(2528, 1760, 48, 48, 14)
+    savedata = game.loadGame()
+
+    player.collider = world:newBSGRectangleCollider(savedata.playerX or 2528, savedata.playerY or 1760, 48, 48, 14)
     player.collider:setFixedRotation(true)
     player.collider:setCollisionClass("Player")
     player.collider:setObject(player)
@@ -57,7 +117,7 @@ function game.load()
         musicmanager.stop("intro")
     end
 
-    game.loadMap("rooms/ship-main.lua", 2528, 1760)
+    game.loadMap("rooms/ship-main.lua", savedata.playerX or 2528, savedata.playerY or 1760)
 
     cam = camera(player.collider:getX(), player.collider:getY())
 
@@ -112,10 +172,18 @@ function game.refreshKeybinds()
 end
 
 function game.update(dt)
+    if love.keyboard.isDown(cachedKeybinds.pause) and not isPaused then
+        isPaused = true
+        initPauseButtons()
+    end
+
+    if isPaused then
+        return
+    end
+
     Starfield.update(dt)
 
     local vx, vy = 0, 0
-
     if love.keyboard.isDown(cachedKeybinds.walkdown) then vy = vy + 1 end
     if love.keyboard.isDown(cachedKeybinds.walkup) then vy = vy - 1 end
     if love.keyboard.isDown(cachedKeybinds.walkleft) then vx = vx - 1 end
@@ -145,27 +213,15 @@ function game.update(dt)
 
     local px, py = player.collider:getPosition()
     cam:lookAt(px, py)
-    
-    -- Top
-    if cam.x < vw/2 then
-        cam.x = vw/2
-    end
-    -- Left
-    if cam.y < vh/2 then
-        cam.y = vh/2
-    end
+
+    if cam.x < vw/2 then cam.x = vw/2 end
+    if cam.y < vh/2 then cam.y = vh/2 end
 
     local mapW = gameMap.width * gameMap.tilewidth
     local mapH = gameMap.height * gameMap.tileheight
 
-    -- Right
-    if cam.x > (mapW - vw/2) then
-        cam.x = (mapW - vw/2)
-    end
-    -- Bottom
-    if cam.y > (mapH - vh/2) then
-        cam.y = (mapH - vh/2)
-    end
+    if cam.x > (mapW - vw/2) then cam.x = (mapW - vw/2) end
+    if cam.y > (mapH - vh/2) then cam.y = (mapH - vh/2) end
 end
 
 function game.draw()
@@ -187,10 +243,38 @@ function game.draw()
     local px, py = player.collider:getPosition()
     love.graphics.circle("fill", px, py, 10)
 
-    world:draw()
-
     cam:detach()
+
+    if isPaused then
+        love.graphics.setColor(0, 0, 0, 0.7)
+        love.graphics.rectangle("fill", 0, 0, vw, vh)
+
+        local title = "Game Paused"
+        local titleW = bigFont:getWidth(title, 2)
+        local titleX = (vw - titleW) / 2
+        local titleY = vh * 0.1
+        love.graphics.setColor(1, 1, 1)
+        bigFont:draw(title, titleX, titleY, 2)
+
+        MenuButtons.draw(pauseButtons, selectedPauseButton, bigFont, pausedFontScale, {1, 1, 0}, {1, 1, 1})
+    end
+
     autoscale.reset()
+end
+
+function game.keypressed(key)
+    if isPaused then
+        if key == "down" then
+            selectedPauseButton = selectedPauseButton % #pauseButtons + 1
+            MenuButtons.updateScroll(pauseButtons, selectedPauseButton)
+        elseif key == "up" then
+            selectedPauseButton = (selectedPauseButton - 2 + #pauseButtons) % #pauseButtons + 1
+            MenuButtons.updateScroll(pauseButtons, selectedPauseButton)
+        elseif key == "return" or key == "z" then
+            if love.keyboard.isDown("lalt", "ralt") then return end
+            MenuButtons.activate(pauseButtons, selectedPauseButton)
+        end
+    end
 end
 
 return game
