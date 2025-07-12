@@ -13,8 +13,6 @@ Wander derelict ships, manage your systems, and uncover the mysteries of the voi
 
 > Think 2D pixel sci-fi with open-ended design, a bit of atmosphere, and room to grow.
 
----
-
 ## Features (WIP)
 
 - Custom pause & save system
@@ -22,8 +20,6 @@ Wander derelict ships, manage your systems, and uncover the mysteries of the voi
 - Basic player movement and camera tracking
 - Modular map loading and object collisions
 - Future goals: terminals, inventory, mission scripting, hostile AIs
-
----
 
 ## How to Run
 
