@@ -40,12 +40,16 @@ local hasSavedInPause = false
 local currentRoom = "rooms/ship-main.lua"
 
 local autosaveTimer = 0
-local autosaveInterval = 10
+local autosaveInterval = 900
+
+local totalPlayTime = 0
+local playTimeThisSession = 0
 
 function game.saveGame()
     save:set("playerX", player.collider:getX(), "Position")
     save:set("playerY", player.collider:getY(), "Position")
     save:set("currentRoom", currentRoom, "Position")
+    save:set("time", totalPlayTime + playTimeThisSession, "Meta")
     save:save()
 end
 
@@ -54,7 +58,10 @@ function game.loadGame()
         playerX = save:get("playerX", "Position"),
         playerY = save:get("playerY", "Position"),
         currentRoom = save:get("currentRoom", "Position"),
+        time = save:get("time", "Meta") or 0,
     }
+    totalPlayTime = savedata.time
+    playTimeThisSession = 0
     return savedata
 end
 
@@ -201,6 +208,8 @@ function game.update(dt)
     if isPaused then
         return
     end
+
+    playTimeThisSession = playTimeThisSession + dt
 
     Starfield.update(dt)
 
