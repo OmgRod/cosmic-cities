@@ -1,112 +1,7 @@
 local autoscale = require("include.autoscale")
 local SpriteFont = require("include.spritefont")
-
-local colorsTable = {
-  cb = {74/255, 82/255, 225/255},
-  cg = {64/255, 227/255, 72/255},
-  cl = {96/255, 171/255, 239/255},
-  cj = {50/255, 200/255, 255/255},
-  cy = {1, 1, 0},
-  co = {1, 90/255, 75/255},
-  cr = {1, 90/255, 90/255},
-  cp = {1, 0, 1},
-  ca = {150/255, 50/255, 1},
-  cd = {1, 150/255, 1},
-  cc = {1, 1, 150/255},
-  cf = {150/255, 1, 1},
-  cs = {1, 220/255, 65/255},
-  c  = {1, 0, 0},
-}
-
-local function hexToRGB(hex)
-  hex = hex:gsub("#", "")
-  local r = tonumber(hex:sub(1,2), 16) / 255
-  local g = tonumber(hex:sub(3,4), 16) / 255
-  local b = tonumber(hex:sub(5,6), 16) / 255
-  return {r, g, b}
-end
-
-local function parseText(input)
-  local tokens = {}
-  local colorStack = { {1,1,1} }
-  local instantStack = {}
-  local delayStack = {}
-  local shakeStack = {}
-  local currentText = ""
-  local i = 1
-  local len = #input
-
-  local function flushText()
-    if #currentText > 0 then
-      local token = {
-        text = currentText,
-        color = colorStack[#colorStack],
-        instant = (#instantStack > 0) and instantStack[#instantStack] or 0,
-        delay = (#delayStack > 0) and delayStack[#delayStack] or 0,
-        shake = (#shakeStack > 0) and shakeStack[#shakeStack] or 0
-      }
-      table.insert(tokens, token)
-      currentText = ""
-    end
-  end
-
-  while i <= len do
-    local c = input:sub(i,i)
-    if c == "<" then
-      local closeTagStart = input:find(">", i, true)
-      if not closeTagStart then
-        currentText = currentText .. "<"
-        i = i + 1
-      else
-        local tag = input:sub(i+1, closeTagStart-1)
-        flushText()
-        if tag == "/c" then
-          if #colorStack > 1 then table.remove(colorStack) end
-        elseif tag == "/i" then
-          if #instantStack > 0 then table.remove(instantStack) end
-        elseif tag == "/d" then
-          if #delayStack > 0 then table.remove(delayStack) end
-        elseif tag == "/s" then
-          if #shakeStack > 0 then table.remove(shakeStack) end
-        else
-          if tag:match("^c#%x%x%x%x%x%x$") then
-            table.insert(colorStack, hexToRGB(tag:sub(2)))
-          elseif colorsTable[tag] then
-            table.insert(colorStack, colorsTable[tag])
-          elseif tag:match("^i%d+$") then
-            local val = tonumber(tag:sub(2))
-            table.insert(instantStack, val)
-          elseif tag:match("^d%d+$") then
-            local val = tonumber(tag:sub(2))
-            table.insert(delayStack, val)
-          elseif tag:match("^s%d+$") then
-            local val = tonumber(tag:sub(2))
-            table.insert(shakeStack, val)
-          else
-            currentText = currentText .. "<" .. tag .. ">"
-          end
-        end
-
-        local nextChar = input:sub(closeTagStart + 1, closeTagStart + 1)
-        if nextChar == " " then
-          currentText = currentText .. " "
-          i = closeTagStart + 2
-        else
-          i = closeTagStart + 1
-        end
-      end
-    else
-      currentText = currentText .. c
-      i = i + 1
-    end
-  end
-  flushText()
-  return tokens
-end
-
-local function shakeOffset(intensity)
-  return (math.random() - 0.5) * 2 * intensity
-end
+local parser = require("include.ui.textbox.parser")
+local shake = require("include.ui.textbox.shake")
 
 local Textbox = {}
 Textbox.__index = Textbox
@@ -163,7 +58,7 @@ function Textbox.new(x, y, text, spriteFont, typeSpeed)
   self.y = y or 0
   self.font = spriteFont
   self.text = text or ""
-  self.tokens = parseText(self.text)
+  self.tokens = parser.parseText(self.text)
   self.typeSpeed = typeSpeed or 30
   self.charTimer = 0
   self.finished = false
@@ -187,7 +82,7 @@ end
 
 function Textbox:setText(text)
   self.text = text
-  self.tokens = parseText(text)
+  self.tokens = parser.parseText(text)
   self.charTimer = 0
   self.finished = false
   self.delayTimer = 0
@@ -268,8 +163,8 @@ function Textbox:draw()
       love.graphics.setColor(segment.color)
       local xOff, yOff = 0, 0
       if segment.shake and segment.shake > 0 then
-        xOff = shakeOffset(segment.shake)
-        yOff = shakeOffset(segment.shake)
+        xOff = shake.shakeOffset(segment.shake)
+        yOff = shake.shakeOffset(segment.shake)
       end
       self.font:draw(textToDraw, segment.x + xOff, segment.y + yOff)
     end
@@ -279,6 +174,11 @@ function Textbox:draw()
   love.graphics.setColor(1, 1, 1)
 end
 
-return {
-    Textbox = Textbox
-}
+function Textbox:advance()
+  self.finished = true
+  if type(self.onFinish) == "function" then
+    self.onFinish()
+  end
+end
+
+return Textbox
