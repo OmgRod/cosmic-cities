@@ -36,7 +36,7 @@ This is a high-level development roadmap for **Cosmic Cities**, covering planned
 
 ## Community Contributions
 
-Want to help? Check out [open issues](https://github.com/yourname/cosmic-cities/issues), or reach out with feature ideas!
+Want to help? Check out [open issues](https://github.com/OmgRod/cosmic-cities/issues), or reach out with feature ideas!
 
 ## Milestones
 
