@@ -181,4 +181,10 @@ function Textbox:advance()
   end
 end
 
+function Textbox:skip()
+  self.tokenCharIndex = 0
+  self.currentTokenIndex = #self.tokens + 1
+  self.finished = true
+end
+
 return Textbox

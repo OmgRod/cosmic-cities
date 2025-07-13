@@ -42,7 +42,7 @@ local buttons = MenuButtons.create({
                 current = current.nextDialog
             end
 
-            mainmenu.textboxGroup = TextboxModule.TextboxGroup.new(texts, bigFont, function() end)
+            mainmenu.textboxGroup = TextboxModule.TextboxGroup.new(texts, bigFont)
             local w = mainmenu.textboxGroup.width or vw
             local h = mainmenu.textboxGroup.height or vh
             mainmenu.textboxGroup:setPosition((vw - w) / 2, (vh - h) / 2)
@@ -122,7 +122,10 @@ end
 
 function mainmenu.keypressed(key, scancode, isrepeat)
     if mainmenu.textboxGroup and mainmenu.textboxGroup:isActive() then
-        if key == "return" or key == "kpenter" then
+        if key == "x" then
+            mainmenu.textboxGroup:skip()
+            return
+        elseif key == "return" or key == "kpenter" then
             mainmenu.textboxGroup:advance()
 
             if not mainmenu.textboxGroup:isActive() then
@@ -149,6 +152,8 @@ function mainmenu.keypressed(key, scancode, isrepeat)
                     local selBoxY = (vh - h) / 2 + h + spacing
 
                     mainmenu.selectionBox = SelectionBox.new(optionItems, bigFont, (vw - boxWidth) / 2, selBoxY, boxWidth, boxHeight)
+                else
+                    mainmenu.selectionBox = nil
                 end
             end
             return

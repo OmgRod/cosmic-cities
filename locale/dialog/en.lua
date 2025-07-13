@@ -11,17 +11,16 @@ local dialogdata = {
         {
           text = "Yes, show me how it works.",
           callback = function()
-            -- leave empty or define later in your code
+            return true
           end
         },
         {
           text = "No, I've played before.",
           callback = function()
-            -- leave empty or define later in your code
+            return false
           end
         }
       },
-      ["next-dialog"] = nil -- explicitly mark no further dialog
     }
   },
 }
