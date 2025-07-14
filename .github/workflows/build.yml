@@ -18,9 +18,15 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y python3-pip python3-venv python3-setuptools pipx
+        python3 -m pip install --upgrade pip setuptools
         python3 -m pipx ensurepath
         export PATH=$HOME/.local/bin:$PATH
         pipx install makelove
+
+    - name: Inject setuptools into makelove pipx env
+      run: |
+        export PATH=$HOME/.local/bin:$PATH
+        pipx inject makelove setuptools
 
     - name: Run makelove build
       run: |
