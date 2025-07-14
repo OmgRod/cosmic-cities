@@ -29,13 +29,9 @@ jobs:
         pipx inject makelove setuptools
 
     - name: Run makelove build
-      run: pipx run --pip-args "install setuptools" makelove
-
-    - name: Upload build artifacts (build directory)
-      uses: actions/upload-artifact@v4
-      with:
-        name: build
-        path: build/
+      run: |
+        export PATH=$HOME/.local/bin:$PATH
+        makelove
 
     - name: Upload AppImage artifact
       uses: actions/upload-artifact@v4
