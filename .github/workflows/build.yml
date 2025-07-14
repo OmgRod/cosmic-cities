@@ -28,37 +28,37 @@ jobs:
         makelove
 
     - name: Upload build artifacts (build directory)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build
         path: build/
 
     - name: Upload AppImage artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: appimage
         path: appimage/squashfs-root/
 
     - name: Upload lovejs artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: lovejs
         path: lovejs/CosmicCities-lovejs.zip
 
     - name: Upload macos artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: macos
         path: macos/CosmicCities-macos.zip
 
     - name: Upload win32 artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: win32
         path: win32/CosmicCities-win32.zip
 
     - name: Upload win64 artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: win64
         path: win64/CosmicCities-win64.zip
