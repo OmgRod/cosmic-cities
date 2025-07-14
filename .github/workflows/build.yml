@@ -7,58 +7,84 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install pipx and dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y python3-pip python3-venv python3-setuptools pipx love
-        python3 -m pip install --upgrade pip setuptools
-        python3 -m pipx ensurepath
-        export PATH=$HOME/.local/bin:$PATH
-        pipx install makelove
+      - name: Install pipx and dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-venv python3-setuptools pipx love
+          python3 -m pip install --upgrade pip setuptools
+          python3 -m pipx ensurepath
+          export PATH=$HOME/.local/bin:$PATH
+          pipx install makelove
 
-    - name: Inject setuptools into makelove pipx env
-      run: |
-        export PATH=$HOME/.local/bin:$PATH
-        pipx inject makelove setuptools
+      - name: Inject setuptools into makelove pipx env
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          pipx inject makelove setuptools
 
-    - name: Run makelove build
-      run: |
-        export PATH=$HOME/.local/bin:$PATH
-        makelove
+      - name: Build macos
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          makelove macos
 
-    - name: Upload AppImage artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: appimage
-        path: appimage/squashfs-root/
+      - name: Upload macos artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: macos/CosmicCities-macos.zip
 
-    - name: Upload lovejs artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: lovejs
-        path: lovejs/CosmicCities-lovejs.zip
+      - name: Build lovejs
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          makelove lovejs
 
-    - name: Upload macos artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos
-        path: macos/CosmicCities-macos.zip
+      - name: Upload lovejs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lovejs
+          path: lovejs/CosmicCities-lovejs.zip
 
-    - name: Upload win32 artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: win32
-        path: win32/CosmicCities-win32.zip
+      - name: Build appimage
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          makelove appimage
 
-    - name: Upload win64 artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: win64
-        path: win64/CosmicCities-win64.zip
+      - name: Upload appimage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: appimage
+          path: appimage/squashfs-root/
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install makelove
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install makelove setuptools
+
+      - name: Build win32
+        run: makelove win32
+
+      - name: Build win64
+        run: makelove win64
+
+      - name: Upload win32 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: win32
+          path: win32/CosmicCities-win32.zip
+
+      - name: Upload win64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: win64
+          path: win64/CosmicCities-win64.zip
