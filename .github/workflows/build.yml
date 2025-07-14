@@ -17,7 +17,7 @@ jobs:
     - name: Install pipx and dependencies
       run: |
         sudo apt update
-        sudo apt install -y python3-pip python3-venv python3-setuptools pipx
+        sudo apt install -y python3-pip python3-venv python3-setuptools pipx love
         python3 -m pip install --upgrade pip setuptools
         python3 -m pipx ensurepath
         export PATH=$HOME/.local/bin:$PATH
