@@ -29,7 +29,7 @@ jobs:
         pipx inject makelove setuptools
 
     - name: Run makelove build
-      run: pipx run makelove
+      run: pipx run --pip-args "install setuptools" makelove
 
     - name: Upload build artifacts (build directory)
       uses: actions/upload-artifact@v4
