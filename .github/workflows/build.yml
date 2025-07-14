@@ -14,23 +14,30 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install pipx and dependencies
+    - name: Install dependencies and add LOVE2D PPA
       run: |
         sudo apt update
+        sudo apt install -y software-properties-common
+        sudo add-apt-repository -y ppa:bartbes/love-stable
+        sudo apt update
         sudo apt install -y python3-pip python3-venv python3-setuptools pipx love
+
+    - name: Upgrade pip and setuptools before pipx install
+      run: |
         python3 -m pip install --upgrade pip setuptools
+
+    - name: Ensure pipx path and install makelove
+      run: |
         python3 -m pipx ensurepath
-        export PATH=$HOME/.local/bin:$PATH
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
         pipx install makelove
 
-    - name: Inject setuptools into makelove pipx env
+    - name: Inject setuptools into makelove pipx environment
       run: |
-        export PATH=$HOME/.local/bin:$PATH
         pipx inject makelove setuptools
 
     - name: Run makelove build
       run: |
-        export PATH=$HOME/.local/bin:$PATH
         makelove
 
     - name: Upload build artifacts (build directory)
