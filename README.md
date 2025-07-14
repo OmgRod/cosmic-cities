@@ -49,6 +49,9 @@ This game uses:
 - [flux](https://github.com/rxi/flux)
 - [Lua_INI_Parser](https://github.com/Dynodzzo/Lua_INI_Parser)
 - [stateswitcher](https://ambience.sk/love2d-a-state-switcher-class-lua/)
+- [love-ase](https://github.com/elloramir/love-ase)
+- [catui](https://github.com/wilhantian/catui)
+- [simple-love-lights](https://github.com/dylhunn/simple-love-lights)
 
 You don't need to install these dependencies yourself as they are already in the `include` directory.
 

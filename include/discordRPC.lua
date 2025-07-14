@@ -1,8 +1,5 @@
 local ffi = require("ffi")
-local cpathutil = require("include.cpathutil")
-cpathutil.enable(true, nil)
 local discordRPClib = ffi.load("discord-rpc")
-cpathutil.disable()
 
 ffi.cdef[[
 typedef struct DiscordRichPresence {

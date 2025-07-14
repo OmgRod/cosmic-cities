@@ -34,3 +34,5 @@ luac.out
 *.hex
 
 *.love
+
+build

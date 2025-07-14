@@ -1,0 +1,9 @@
+name = "CosmicCities"
+default_targets = ["win32", "win64", "macos", "lovejs"] # "appimage"
+love_version = "11.5"
+build_directory = "build"
+
+love_files = [
+    "::git-ls-tree::",
+    "-*/.*",
+]
