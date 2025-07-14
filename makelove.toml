@@ -1,9 +1,63 @@
 name = "CosmicCities"
-default_targets = ["win32", "win64", "macos", "lovejs"] # "appimage"
+default_targets = ["win32", "win64", "macos", "lovejs", "appimage"]
 love_version = "11.5"
 build_directory = "build"
 
 love_files = [
     "::git-ls-tree::",
     "-*/.*",
+    "-build",
+    "-bin"
 ]
+
+icon_file = "icons/icon64.png"
+
+[hooks]
+
+[hooks.parameters]
+
+[windows.archive_files]
+
+[windows.exe_metadata]
+FileDescription = "{name} {version}"
+FileVersion = "{version}"
+CompanyName = "OmgRod"
+LegalCopyright = "© OmgRod 2025"
+ProductName = "{name}"
+ProductVersion = "{version}"
+OriginalFilename = "CosmicCities.exe"
+
+[win32]
+shared_libraries = [
+    "bin/win32/discord-rpc.dll",
+    "bin/win32/win32_luasteam.dll",
+    "bin/win32/steam_api.dll"
+]
+
+[win64]
+shared_libraries = [
+    "bin/win64/discord-rpc.dll",
+    "bin/win64/luasteam.dll",
+    "bin/win64/steam_api64.dll"
+]
+
+[macos]
+icon_file = "icons/icon64.png"
+[macos.archive_files]
+
+[macos.app_metadata]
+CFBundleName = "CosmicCities"
+CFBundleIdentifier = "com.omgrod.cosmic"
+NSHumanReadableCopyright = "© OmgRod 2025"
+CFBundleShortVersionString = "{version}"
+
+[appimage]
+shared_libraries = [
+    "bin/linux64/linux64_luasteam.so",
+    "bin/linux64/libsteam_api.so",
+    "bin/linux64/discord-rpc.so"
+]
+
+[lovejs]
+title = "CosmicCities"
+memory = "20000000"

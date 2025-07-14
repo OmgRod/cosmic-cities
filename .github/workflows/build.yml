@@ -1,0 +1,64 @@
+name: Build with makelove
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install pipx and dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y python3-pip python3-venv python3-setuptools pipx
+        python3 -m pipx ensurepath
+        export PATH=$HOME/.local/bin:$PATH
+        pipx install makelove
+
+    - name: Run makelove build
+      run: |
+        export PATH=$HOME/.local/bin:$PATH
+        makelove
+
+    - name: Upload build artifacts (build directory)
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        path: build/
+
+    - name: Upload AppImage artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: appimage
+        path: appimage/squashfs-root/
+
+    - name: Upload lovejs artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: lovejs
+        path: lovejs/CosmicCities-lovejs.zip
+
+    - name: Upload macos artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos
+        path: macos/CosmicCities-macos.zip
+
+    - name: Upload win32 artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: win32
+        path: win32/CosmicCities-win32.zip
+
+    - name: Upload win64 artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: win64
+        path: win64/CosmicCities-win64.zip

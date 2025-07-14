@@ -26,6 +26,7 @@ This is a high-level development roadmap for **Cosmic Cities**, covering planned
 - [ ] Parallax starfield or layered backgrounds
 - [ ] Pause menu visual improvements
 - [ ] Add shaders
+- [ ] Add Y-based draw order
 
 ## Infrastructure & Code
 
