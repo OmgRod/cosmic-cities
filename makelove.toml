@@ -1,5 +1,5 @@
 name = "CosmicCities"
-default_targets = ["win32", "win64", "macos", "lovejs", "appimage"]
+default_targets = ["win64"]
 love_version = "11.5"
 build_directory = "build"
 

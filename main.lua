@@ -5,8 +5,8 @@ local flux = require("include.flux")
 local GameSaveManager = require("include.gamesave")
 local musicmanager = require("include.musicmanager")
 local discord = require("include.discordRPC")
-local ffi = require("ffi")
 local steam = require("include.steamwrapper")
+local timer = require("include.hump.timer")
 
 local escapeHoldTime = 0
 local escapeHeld = false
@@ -21,24 +21,26 @@ local quitting = false
 
 local vw, vh = autoscale.getVirtualSize()
 
-local notificationSprite = nil
-local notificationX = vw
-local notificationY = -100
-local notificationTimer = 0
-local notificationActive = false
+local notification = {
+    sprite = nil,
+    x = vw,
+    y = -100,
+    active = false,
+    timer = 0
+}
 
 function notifySprite(sprite)
-    notificationSprite = sprite
-    notificationX = vw
-    notificationY = -100
-    notificationTimer = 0
-    notificationActive = true
+    notification.sprite = sprite
+    notification.x = vw
+    notification.y = -100
+    notification.timer = 0
+    notification.active = true
 
-    flux.to(_G, 0.5, { notificationX = vw - sprite:getWidth() - 10, notificationY = 10 }):ease("quadout")
-    flux.after(_G, 3, {}):oncomplete(function()
-        flux.to(_G, 0.5, { notificationY = -100 }):ease("quadin"):oncomplete(function()
-            notificationActive = false
-            notificationSprite = nil
+    flux.to(notification, 0.5, { x = vw - sprite:getWidth() - 10, y = 10 }):ease("quadout")
+    flux.to(notification, 0, {}):delay(3):oncomplete(function()
+        flux.to(notification, 0.5, { y = -100 }):ease("quadin"):oncomplete(function()
+            notification.active = false
+            notification.sprite = nil
         end)
     end)
 end
@@ -83,6 +85,8 @@ function love.load()
     musicmanager.load("music.intro.old", "assets/sounds/music.intro.old.wav", "stream")
 
     state.switch("states/loading")
+
+    notifySprite(love.graphics.newImage("assets/sprites/CC_aprilIcon_001.png"))
 end
 
 function love.update(dt)
@@ -159,9 +163,9 @@ function love.draw()
         quitFont:draw(text, x, y, scale)
     end
 
-    if notificationActive and notificationSprite then
+    if notification.active and notification.sprite then
         love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.draw(notificationSprite, notificationX, notificationY)
+        love.graphics.draw(notification.sprite, notification.x, notification.y)
     end
 
     love.graphics.setColor(1, 1, 1, 1)

@@ -69,13 +69,24 @@ function SelectionBox:draw()
   love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
 
   for i, opt in ipairs(self.layout) do
+    local textHeight = self.font.lineHeight or self.font:getHeight()
+    local maxHeight = self.height - self.paddingY * 2
+    local scale = math.min(1, maxHeight / textHeight)
+
+    local drawX = opt.x
+    local drawY = opt.y + (textHeight - textHeight * scale) / 2
+
     if i == self.selected then
       love.graphics.setColor(1, 1, 0)
-      self.font:draw(opt.text, opt.x, opt.y)
     else
       love.graphics.setColor(1, 1, 1)
-      self.font:draw(opt.text, opt.x, opt.y)
     end
+
+    love.graphics.push()
+    love.graphics.translate(drawX, drawY)
+    love.graphics.scale(scale, scale)
+    self.font:draw(opt.text, 0, 0)
+    love.graphics.pop()
   end
 
   love.graphics.setColor(1, 1, 1)
